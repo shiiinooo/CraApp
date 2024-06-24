@@ -8,6 +8,11 @@ builder.Services.AddSwaggerGen();
 // ------------ Cater--------------
 builder.Services.AddCarter();
 
+
+// -----------DB Context ------------
+builder.Services.AddDbContext<AppDbContext>(option => {
+    option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultSQLConnection"));
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

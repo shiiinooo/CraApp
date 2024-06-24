@@ -1,4 +1,6 @@
-﻿namespace CraApp.Features.Activity;
+﻿using CraApp.Model.DTO;
+
+namespace CraApp.Features.Activity;
 
 public class CreateActivity : ICarterModule
 {

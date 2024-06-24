@@ -1,5 +1,5 @@
 ﻿namespace CraApp.Repository.IRepository;
 
-public interface ActivityRepository
+public interface IActivityRepository : IRepository<Activity>
 {
 }
