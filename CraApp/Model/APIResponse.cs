@@ -12,4 +12,3 @@ public class APIResponse
     public HttpStatusCode StatusCode { get; set; }
     public List<string> ErrorsMessages { get; set; }
 }
-
