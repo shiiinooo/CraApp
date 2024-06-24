@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-namespace CraApp.CQRS;
+﻿namespace CraApp.CQRS;
 
 public interface IQuery<out TResponse> : IRequest<TResponse>
 where TResponse : notnull
