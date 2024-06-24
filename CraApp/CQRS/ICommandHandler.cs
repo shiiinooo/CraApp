@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-namespace CraApp.CQRS;
+﻿namespace CraApp.CQRS;
 
 public interface ICommandHandler<in TCommand>
 : ICommandHandler<TCommand, Unit>

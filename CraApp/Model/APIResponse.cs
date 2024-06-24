@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace CraApp.Model;
+﻿namespace CraApp.Model;
 
 public class APIResponse
 {
