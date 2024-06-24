@@ -1,0 +1,6 @@
+@CraApp_HostAddress = http://localhost:5014
+
+GET {{CraApp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
