@@ -1,3 +1,5 @@
+using CraApp.Repository;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,9 +7,23 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// ------------ Register Repositories --------------
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
 // ------------ Cater--------------
+
 builder.Services.AddCarter();
 
+// ------------ MediatR --------------
+
+var assembly = typeof(Program).Assembly;
+
+builder.Services.AddMediatR(config =>
+{
+    config.RegisterServicesFromAssembly(assembly);
+});
 
 // -----------DB Context ------------
 builder.Services.AddDbContext<AppDbContext>(option => {
