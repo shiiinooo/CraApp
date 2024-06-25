@@ -22,4 +22,10 @@ public class UserRepository : Repository<User>, IUserRepository
         return await _db.Users
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
+
+    public async Task UpdateAsync(User user, CancellationToken cancellationToken)
+    {
+        _db.Entry(user).State = EntityState.Modified;
+        await _db.SaveChangesAsync(cancellationToken);
+    }
 }
