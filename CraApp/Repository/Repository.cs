@@ -27,7 +27,7 @@ public class Repository<T> : IRepository<T> where T : class
         return dbSet.ToListAsync(cancellationToken);
     }
 
-    public async Task SaveAsync(CancellationToken cancellationToken)
+    public async Task SaveAsync()
     {
         await _db.SaveChangesAsync();
     }
