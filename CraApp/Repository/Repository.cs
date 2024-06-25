@@ -1,7 +1,4 @@
-﻿using CraApp.Data;
-using Microsoft.EntityFrameworkCore;
-
-namespace CraApp.Repository;
+﻿namespace CraApp.Repository;
 
 public class Repository<T> : IRepository<T> where T : class
 {
@@ -10,12 +7,12 @@ public class Repository<T> : IRepository<T> where T : class
 
     public Repository(AppDbContext db)
     {
-        dbSet = _db.Set<T>();
         _db = db;
+        dbSet = _db.Set<T>();
     }
-    public async Task CreateAsync(T entity)
+    public async Task CreateAsync(T entity, CancellationToken cancellationToken)
     {
-        await dbSet.AddAsync(entity);
+        await dbSet.AddAsync(entity, cancellationToken);
         await SaveAsync();
     }
 
@@ -25,9 +22,9 @@ public class Repository<T> : IRepository<T> where T : class
         await SaveAsync();
     }
 
-    public Task<List<T>> GetAllAsync()
+    public Task<List<T>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return dbSet.ToListAsync();
+        return dbSet.ToListAsync(cancellationToken);
     }
 
     public async Task SaveAsync()

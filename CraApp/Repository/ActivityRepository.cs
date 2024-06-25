@@ -1,5 +1,4 @@
-﻿
-namespace CraApp.Repository;
+﻿namespace CraApp.Repository;
 
 public class ActivityRepository : Repository<Activity>, IActivityRepository
 {

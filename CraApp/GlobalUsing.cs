@@ -10,3 +10,6 @@ global using System.ComponentModel.DataAnnotations.Schema;
 global using System.ComponentModel.DataAnnotations;
 global using CraApp.Repository.IRepository;
 global using CraApp.Data;
+global using Mapster;
+global using CraApp.CQRS;
+global using CraApp.Model.DTO;

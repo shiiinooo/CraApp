@@ -12,6 +12,6 @@ public class CreateActivity : ICarterModule
 
     private async Task CreateActivityHandler([FromBody] ActivityDTO activityDTO)
     {
-        
+        return;
     }
 }
