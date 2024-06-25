@@ -1,8 +1,4 @@
-﻿using System.Data;
-using System.Xml.Linq;
-using static Azure.Core.HttpHeader;
-
-namespace CraApp.Data;
+﻿namespace CraApp.Data;
 
 
 public class AppDbContext : DbContext

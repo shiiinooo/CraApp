@@ -12,22 +12,22 @@ public class Repository<T> : IRepository<T> where T : class
     }
     public async Task CreateAsync(T entity, CancellationToken cancellationToken)
     {
-        await dbSet.AddAsync(entity);
-        await SaveAsync(cancellationToken);
+        await dbSet.AddAsync(entity, cancellationToken);
+        await SaveAsync();
     }
 
-    public async Task DeleteAsync(T entity, CancellationToken cancellationToken)
+    public async Task DeleteAsync(T entity)
     {
         dbSet.Remove(entity);
-        await SaveAsync(cancellationToken);
+        await SaveAsync();
     }
 
     public Task<List<T>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return dbSet.ToListAsync();
+        return dbSet.ToListAsync(cancellationToken);
     }
 
-    public async Task SaveAsync(CancellationToken cancellationToken)
+    public async Task SaveAsync()
     {
         await _db.SaveChangesAsync();
     }

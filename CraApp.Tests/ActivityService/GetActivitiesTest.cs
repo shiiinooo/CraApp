@@ -28,7 +28,7 @@ namespace CraApp.Tests.ActivityService
 
             Assert.NotNull(_response);
             Assert.Equal(HttpStatusCode.OK, _response.StatusCode);
-            //Assert.NotNull(_response.Result);
+            Assert.NotNull(_response.Result);
         }
     }
 }

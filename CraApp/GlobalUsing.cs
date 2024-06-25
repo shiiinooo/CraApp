@@ -13,3 +13,4 @@ global using Microsoft.EntityFrameworkCore.Storage;
 global using System.ComponentModel.DataAnnotations.Schema;
 global using System.ComponentModel.DataAnnotations;
 global using CraApp.Data;
+global using Mapster;
