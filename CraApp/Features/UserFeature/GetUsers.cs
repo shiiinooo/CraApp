@@ -1,4 +1,4 @@
-﻿namespace CraApp.Features.User;
+﻿namespace CraApp.Features.UserFeature;
 
 // Query
 public record GetUsersQuery() : IQuery<IEnumerable<GetUserResult>>;
@@ -25,7 +25,7 @@ internal class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, IEnumerable<G
 }
 
 // Endpoint
-public class UsersEndpoint : ICarterModule
+public class UsersGetEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {

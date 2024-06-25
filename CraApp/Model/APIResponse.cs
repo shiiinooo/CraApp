@@ -1,4 +1,6 @@
-﻿namespace CraApp.Model;
+﻿using System.Text.Json.Serialization;
+
+namespace CraApp.Model;
 
 public class APIResponse
 {
