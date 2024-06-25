@@ -10,6 +10,7 @@ builder.Services.AddSwaggerGen();
 // ------------ Register Repositories --------------
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
 
 // ------------ Cater--------------
