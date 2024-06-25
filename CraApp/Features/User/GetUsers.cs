@@ -18,7 +18,7 @@ internal class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, IEnumerable<G
 
     public async Task<IEnumerable<GetUserResult>> Handle(GetUsersQuery query, CancellationToken cancellationToken)
     {
-        var users = await _repository.GetUsersAsync(cancellationToken);
+        var users = await _repository.GetAllAsync(cancellationToken);
 
         return users.Select(u => new GetUserResult(u.Id, u.UserName, u.Name)).ToList();
     }
@@ -31,6 +31,7 @@ public class UsersEndpoint : ICarterModule
     {
         app.MapGet("/users", async (ISender sender) =>
         {
+            APIResponse response = new();
             var query = new GetUsersQuery();
             var users = await sender.Send(query);
 
@@ -39,9 +40,12 @@ public class UsersEndpoint : ICarterModule
                 return Results.NotFound();
             }
 
-            return Results.Ok(users);
+            response.Result = users;
+            response.IsSuccess = true;
+            response.StatusCode = HttpStatusCode.OK;
+            return Results.Ok(response);
         })
-        .Produces<IEnumerable<UserDTO>>(StatusCodes.Status200OK)
+        .Produces<APIResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithName("GetUsers")
         .WithSummary("Get Users")

@@ -1,6 +1,6 @@
 ﻿namespace CraApp.Repository.IRepository;
 
-public interface IUserRepository
+public interface IUserRepository : IRepository<User>
 {
-    Task<List<User>> GetUsersAsync(CancellationToken cancellationToken);
+    
 }
