@@ -21,27 +21,41 @@ public class GetUsersTest : IClassFixture<WebApplicationFactory<Program>>
 
         // Assert
         response.EnsureSuccessStatusCode(); // Status Code 200-299
+        var responseString = await response.Content.ReadAsStringAsync();
 
-        var apiResponse = await response.Content.ReadFromJsonAsync<APIResponse>();
+        // Define JSON serializer options for case-insensitive matching
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
+        // Deserialize APIResponse with options
+        var apiResponse = JsonSerializer.Deserialize<APIResponse>(responseString, options);
+        Assert.NotNull(apiResponse);
+        Assert.True(apiResponse.IsSuccess);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Empty(apiResponse.ErrorsMessages ?? new List<string>());
+
+        // Deserialize the Result to UserDTO
+        var jsonElement = (JsonElement)apiResponse.Result;
+        var users = JsonSerializer.Deserialize<List<UserDTO>>(jsonElement.GetRawText(), options);
+
+        
 
         Assert.NotNull(apiResponse);
         Assert.True(apiResponse.IsSuccess);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Empty(apiResponse.ErrorsMessages ?? new List<string>());
 
-        if (apiResponse.Result is List<UserDTO> users)
+        foreach (var user in users)
         {
-            Assert.NotEmpty(users);
-            
-            foreach (var user in users)
-            {
-                Assert.True(user.Id > 0, "User ID should be greater than 0.");
-                Assert.NotNull(user.UserName);
-                Assert.NotNull(user.Name);
-            }
+            Assert.True(user.Id > 0, "User ID should be greater than 0.");
+            Assert.NotNull(user.UserName);
+            Assert.NotNull(user.Name);
         }
 
-
-
     }
+
+   
+
 }

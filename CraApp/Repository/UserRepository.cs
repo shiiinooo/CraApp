@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CraApp.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace CraApp.Repository;
 
@@ -14,5 +15,11 @@ public class UserRepository : Repository<User>, IUserRepository
     {
         return await _db.Users
             .FirstOrDefaultAsync(u => u.UserName == userName, cancellationToken);
+    }
+
+    public async Task<User> GetByIdAsync(int id, CancellationToken cancellationToken)
+    {
+        return await _db.Users
+            .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
 }

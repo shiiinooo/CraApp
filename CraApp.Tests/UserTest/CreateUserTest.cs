@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using CraApp.Data;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CraApp.Tests.UserTest;
 
@@ -17,6 +18,7 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task CreateUser_Endpoint_Returns_Correct_Response()
     {
         // Arrange
+        await ClearDatabaseAsync();
         var client = _factory.CreateClient();
         var newUser = new UserDTO
         {
@@ -54,12 +56,16 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
         Assert.Equal(newUser.UserName, createdUser.UserName);
         Assert.Equal(newUser.Name, createdUser.Name);
         Assert.True(createdUser.Id > 0, "User ID should be greater than 0.");
+
+        await ClearDatabaseAsync();
+        _client.Dispose();
     }
 
     [Fact]
     public async Task CreateUser_Endpoint_Returns_BadRequest_For_Invalid_Input()
     {
         // Arrange
+        //await ClearDatabaseAsync();
         var client = _factory.CreateClient();
         var invalidUser = new UserDTO
         {
@@ -79,12 +85,14 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
         Assert.NotNull(apiResponse);
         Assert.False(apiResponse.IsSuccess);
         Assert.NotEmpty(apiResponse.ErrorsMessages ?? new List<string>());
+        _client.Dispose();
     }
 
     [Fact]
     public async Task CreateUser_Endpoint_Returns_Conflict_For_Duplicate_User()
     {
         // Arrange
+        await ClearDatabaseAsync();
         var client = _factory.CreateClient();
         var newUser = new UserDTO
         {
@@ -108,6 +116,9 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
         Assert.NotNull(apiResponse);
         Assert.False(apiResponse.IsSuccess);
         Assert.NotEmpty(apiResponse.ErrorsMessages ?? new List<string>());
+
+        await ClearDatabaseAsync();
+        _client.Dispose();
     }
 
     [Fact]
@@ -134,7 +145,22 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
         Assert.NotEmpty(apiResponse.ErrorsMessages ?? new List<string>());
     }
 
-    
+    public void Dispose()
+    {
+        _client.Dispose();
+        _factory.Dispose();
+    }
+
+    private async Task ClearDatabaseAsync()
+    {
+        // Implement logic to clear or reset database state
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await dbContext.Database.EnsureDeletedAsync();
+            await dbContext.Database.EnsureCreatedAsync();
+        }
+    }
 
 
 

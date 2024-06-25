@@ -20,9 +20,15 @@ internal class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, IEnumerable<G
     {
         var users = await _repository.GetAllAsync(cancellationToken);
 
+        if (users == null || !users.Any())
+        {
+            return Enumerable.Empty<GetUserResult>();
+        }
+
         return users.Select(u => new GetUserResult(u.Id, u.UserName, u.Name)).ToList();
     }
 }
+
 
 // Endpoint
 public class UsersGetEndpoint : ICarterModule
@@ -35,14 +41,10 @@ public class UsersGetEndpoint : ICarterModule
             var query = new GetUsersQuery();
             var users = await sender.Send(query);
 
-            if (users == null || !users.Any())
-            {
-                return Results.NotFound();
-            }
-
             response.Result = users;
             response.IsSuccess = true;
-            response.StatusCode = HttpStatusCode.OK;
+            response.StatusCode = users.Any() ? HttpStatusCode.OK : HttpStatusCode.NotFound;
+
             return Results.Ok(response);
         })
         .Produces<APIResponse>(StatusCodes.Status200OK)
