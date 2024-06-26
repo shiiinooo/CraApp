@@ -4,6 +4,7 @@ using CraApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240625152135_AddingMonthlyActivities")]
+    partial class AddingMonthlyActivities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,7 +39,7 @@ namespace CraApp.Migrations
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time(0)");
 
-                    b.Property<int>("MonthlyActivitiesId")
+                    b.Property<int>("MonthlyAID")
                         .HasColumnType("int");
 
                     b.Property<int>("Project")
@@ -47,7 +50,7 @@ namespace CraApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MonthlyActivitiesId");
+                    b.HasIndex("MonthlyAID");
 
                     b.ToTable("Activities");
 
@@ -57,7 +60,7 @@ namespace CraApp.Migrations
                             Id = 1,
                             Day = 1,
                             EndTime = new TimeSpan(0, 18, 0, 0, 0),
-                            MonthlyActivitiesId = 0,
+                            MonthlyAID = 0,
                             Project = 1,
                             StartTime = new TimeSpan(0, 10, 0, 0, 0)
                         });
@@ -129,7 +132,7 @@ namespace CraApp.Migrations
                 {
                     b.HasOne("CraApp.Model.MonthlyActivities", "MonthlyActivities")
                         .WithMany("Activities")
-                        .HasForeignKey("MonthlyActivitiesId")
+                        .HasForeignKey("MonthlyAID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

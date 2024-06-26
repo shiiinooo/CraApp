@@ -2,4 +2,5 @@
 
 public interface IActivityRepository : IRepository<Activity>
 {
+    Task<Activity> GetById(int Id);
 }

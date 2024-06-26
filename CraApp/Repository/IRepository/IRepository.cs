@@ -6,4 +6,5 @@ public interface IRepository<T> where T : class
     Task CreateAsync(T entity, CancellationToken cancellationToken);
     Task DeleteAsync(T entity);
     Task SaveAsync();
+ 
 }
