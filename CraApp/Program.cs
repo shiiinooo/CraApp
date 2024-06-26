@@ -46,6 +46,7 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
+builder.Services.AddScoped<IMonthlyActivitiesRepository, MonthlyActivitiesRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
 // ------------ Cater--------------
@@ -104,6 +105,8 @@ builder.Services.AddAuthorization(options =>
 // ----------- BUILD ------------
 
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -4,6 +4,7 @@ using CraApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240625143538_addingDDate")]
+    partial class addingDDate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,24 +33,19 @@ namespace CraApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Day")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
 
                     b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time(0)");
-
-                    b.Property<int>("MonthlyActivitiesId")
-                        .HasColumnType("int");
+                        .HasColumnType("time");
 
                     b.Property<int>("Project")
                         .HasColumnType("int");
 
                     b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time(0)");
+                        .HasColumnType("time");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("MonthlyActivitiesId");
 
                     b.ToTable("Activities");
 
@@ -55,31 +53,11 @@ namespace CraApp.Migrations
                         new
                         {
                             Id = 1,
-                            Day = 1,
+                            Date = new DateTime(2024, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             EndTime = new TimeSpan(0, 18, 0, 0, 0),
-                            MonthlyActivitiesId = 0,
                             Project = 1,
                             StartTime = new TimeSpan(0, 10, 0, 0, 0)
                         });
-                });
-
-            modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Month")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MonthlyActivities");
                 });
 
             modelBuilder.Entity("CraApp.Model.User", b =>
@@ -123,22 +101,6 @@ namespace CraApp.Migrations
                             Role = "admin",
                             UserName = "PipInstallGeek"
                         });
-                });
-
-            modelBuilder.Entity("CraApp.Model.Activity", b =>
-                {
-                    b.HasOne("CraApp.Model.MonthlyActivities", "MonthlyActivities")
-                        .WithMany("Activities")
-                        .HasForeignKey("MonthlyActivitiesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MonthlyActivities");
-                });
-
-            modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
-                {
-                    b.Navigation("Activities");
                 });
 #pragma warning restore 612, 618
         }
