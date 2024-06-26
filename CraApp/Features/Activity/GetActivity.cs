@@ -1,6 +1,6 @@
 ﻿namespace CraApp.Features.Activity;
 
-public record GetActivityResult(TimeSpan StartTime, TimeSpan EndTime);
+public record GetActivityResult(TimeSpan StartTime, TimeSpan EndTime, String Project);
 public record GetAcitivityQuery() : IQuery<IEnumerable<GetActivityResult>>;
 
 
@@ -14,7 +14,10 @@ public class GetActivity : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/api/activity", GetActivityHandler)
-            .WithName("GetActivity");
+            .WithName("GetActivity")
+            .Produces<APIResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .WithSummary("Retrieving All Activities");
     }
 
     private async Task<IResult> GetActivityHandler(ISender sender)
@@ -43,7 +46,7 @@ internal class GetActivitiesHandler : IQueryHandler<GetAcitivityQuery, IEnumerab
     public async Task<IEnumerable<GetActivityResult>> Handle(GetAcitivityQuery request, CancellationToken cancellationToken)
     {
         var activities = await _activityRepository.GetAllAsync(cancellationToken);
-        var activityResult = activities.Select(u => new GetActivityResult(u.StartTime, u.EndTime)).ToList();
+        var activityResult = activities.Select(u => new GetActivityResult(u.StartTime, u.EndTime, Enum.GetName(u.Project))).ToList();
         return activityResult;
     }
 }
