@@ -61,7 +61,10 @@ public class UsersDeleteEndpoint : ICarterModule
                 return Results.Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.InternalServerError);
             }
         })
+        .RequireAuthorization("AdminOnly")
         .Produces<APIResponse>(StatusCodes.Status204NoContent)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .ProducesProblem(StatusCodes.Status500InternalServerError)
         .WithName("DeleteUser")

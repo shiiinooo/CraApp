@@ -1,17 +1,28 @@
-﻿using CraApp.Data;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace CraApp.Tests.UserTest;
+﻿namespace CraApp.Tests.UserTest;
 
 public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
+    private JsonSerializerOptions _options;
+    private User _newUser;
 
     public UpdateUserTest(WebApplicationFactory<Program> factory)
     {
         _factory = factory;
         _client = _factory.CreateClient();
+        // Define JSON serializer options for case-insensitive matching
+        _options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        _newUser = new User
+        {
+            UserName = "userToUpdate",
+            Name = "name",
+            Password = "Admin123@",
+            Role = "admin",
+        };
     }
 
     [Fact]
@@ -19,41 +30,32 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
     {
         // Arrange
         await ClearDatabaseAsync();
-        var client = _factory.CreateClient();
-
-        // Create a new user first
-        var newUser = new UserDTO
-        {
-            UserName = "testuser",
-            Name = "Test User"
-        };
-        var createUserContent = JsonContent.Create(newUser);
-        var createResponse = await client.PostAsync("/users", createUserContent);
+        var token = await GetJwtToken();
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+      
+        var createUserContent = JsonContent.Create(_newUser);
+        var createResponse = await _client.PostAsync("/users", createUserContent);
         createResponse.EnsureSuccessStatusCode();
         var createResponseString = await createResponse.Content.ReadAsStringAsync();
-        // Define JSON serializer options for case-insensitive matching
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-        var createApiResponse = JsonSerializer.Deserialize<APIResponse>(createResponseString, options);
-        var createdUser = JsonSerializer.Deserialize<UserDTO>(createApiResponse.Result.ToString(), options);
+        var createApiResponse = JsonSerializer.Deserialize<APIResponse>(createResponseString, _options);
+        var createdUser = JsonSerializer.Deserialize<UserDTO>(createApiResponse.Result.ToString(), _options);
 
         // Update user data
         var updatedUser = new UserDTO
         {
             Id = createdUser.Id,
             UserName = "updateduser",
-            Name = "Updated User"
+            Name = "Updated User",
+            Role = "newRole",
         };
         var updateContent = JsonContent.Create(updatedUser);
 
         // Act
-        var updateResponse = await client.PutAsync($"/users/{createdUser.Id}", updateContent);
+        var updateResponse = await _client.PutAsync($"/users/{createdUser.Id}", updateContent);
         updateResponse.EnsureSuccessStatusCode();
         var updateResponseString = await updateResponse.Content.ReadAsStringAsync();
-        var updateApiResponse = JsonSerializer.Deserialize<APIResponse>(updateResponseString, options);
-        var updatedUserResponse = JsonSerializer.Deserialize<UserDTO>(updateApiResponse.Result.ToString(), options);
+        var updateApiResponse = JsonSerializer.Deserialize<APIResponse>(updateResponseString, _options);
+        var updatedUserResponse = JsonSerializer.Deserialize<UserDTO>(updateApiResponse.Result.ToString(), _options);
 
         // Assert
         Assert.NotNull(updateApiResponse);
@@ -68,26 +70,26 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
         _client.Dispose();
     }
 
-   
-
     [Fact]
     public async Task UpdateUser_Endpoint_Returns_NotFound_For_Nonexistent_User()
     {
         // Arrange
         await ClearDatabaseAsync();
-        var client = _factory.CreateClient();
+        var token = await GetJwtToken();
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var nonExistentUserId = 999; // Assuming this ID does not exist
 
-        var updateUser = new UserDTO
+        var updateUser = new User
         {
             Id = nonExistentUserId,
             UserName = "updateduser",
-            Name = "Updated User"
+            Name = "Updated User",
+            Role = "newRole"
         };
         var updateContent = JsonContent.Create(updateUser);
 
         // Act
-        var response = await client.PutAsync($"/users/{nonExistentUserId}", updateContent);
+        var response = await _client.PutAsync($"/users/{nonExistentUserId}", updateContent);
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -101,37 +103,28 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
     {
         // Arrange
         await ClearDatabaseAsync();
-        var client = _factory.CreateClient();
+        var token = await GetJwtToken();
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        // Create a new user first
-        var newUser = new UserDTO
-        {
-            UserName = "testuser",
-            Name = "Test User"
-        };
-        var createUserContent = JsonContent.Create(newUser);
-        var createResponse = await client.PostAsync("/users", createUserContent);
+        var createUserContent = JsonContent.Create(_newUser);
+        var createResponse = await _client.PostAsync("/users", createUserContent);
         createResponse.EnsureSuccessStatusCode();
         var createResponseString = await createResponse.Content.ReadAsStringAsync();
-        // Define JSON serializer options for case-insensitive matching
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-        var createApiResponse = JsonSerializer.Deserialize<APIResponse>(createResponseString, options);
-        var createdUser = JsonSerializer.Deserialize<UserDTO>(createApiResponse.Result.ToString(), options);
+        var createApiResponse = JsonSerializer.Deserialize<APIResponse>(createResponseString, _options);
+        var createdUser = JsonSerializer.Deserialize<UserDTO>(createApiResponse.Result.ToString(), _options);
 
         // Attempt to update with invalid data (empty UserName)
         var invalidUpdateUser = new UserDTO
         {
             Id = createdUser.Id,
             UserName = "", // Invalid input
-            Name = "Updated User"
+            Name = "Updated User",
+            Role = "admin",
         };
         var invalidUpdateContent = JsonContent.Create(invalidUpdateUser);
 
         // Act
-        var response = await client.PutAsync($"/users/{createdUser.Id}", invalidUpdateContent);
+        var response = await _client.PutAsync($"/users/{createdUser.Id}", invalidUpdateContent);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -155,6 +148,33 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
             await dbContext.Database.EnsureDeletedAsync();
             await dbContext.Database.EnsureCreatedAsync();
         }
+    }
+
+    private async Task<string> GetJwtToken()
+    {
+        var loginRequest = new
+        {
+            UserName = "shiinoo",
+            Password = "Password123#"
+        };
+
+        var response = await _client.PostAsJsonAsync("/login", loginRequest);
+        response.EnsureSuccessStatusCode();
+
+        var responseString = await response.Content.ReadAsStringAsync();
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var apiResponse = JsonSerializer.Deserialize<APIResponse>(responseString, options);
+
+        if (apiResponse?.Result != null)
+        {
+            var loginResponse = JsonSerializer.Deserialize<LoginResponseDTO>(apiResponse.Result.ToString(), options);
+            return loginResponse?.Token;
+        }
+
+        throw new InvalidOperationException("Failed to retrieve JWT token");
     }
 
 

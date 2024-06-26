@@ -1,10 +1,10 @@
 ﻿namespace CraApp.Features.UserFeature;
 
 // Command
-public record UpdateUserCommand(int Id, string UserName, string Name) : ICommand<UpdateUserResult>;
+public record UpdateUserCommand(int Id, string UserName, string Name, string Role) : ICommand<UpdateUserResult>;
 
 // Result
-public record UpdateUserResult(int Id, string UserName, string Name);
+public record UpdateUserResult(int Id, string UserName, string Name, string Role);
 
 // Handler
 internal class UpdateUserCommandHandler : ICommandHandler<UpdateUserCommand, UpdateUserResult>
@@ -34,11 +34,12 @@ internal class UpdateUserCommandHandler : ICommandHandler<UpdateUserCommand, Upd
         // Update the user details
         existingUser.UserName = command.UserName;
         existingUser.Name = command.Name;
+        existingUser.Role = command.Role;
 
         await _repository.UpdateAsync(existingUser, cancellationToken);
         await _repository.SaveAsync();
 
-        return new UpdateUserResult(existingUser.Id, existingUser.UserName, existingUser.Name);
+        return new UpdateUserResult(existingUser.Id, existingUser.UserName, existingUser.Name, existingUser.Role);
     }
 }
 
@@ -91,8 +92,11 @@ public class UsersPutEndpoint : ICarterModule
                 return Results.Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.InternalServerError);
             }
         })
+        .RequireAuthorization("AdminOnly")
         .Produces<APIResponse>(StatusCodes.Status200OK)
         .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .ProducesProblem(StatusCodes.Status500InternalServerError)
         .WithName("UpdateUser")

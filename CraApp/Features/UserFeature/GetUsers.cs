@@ -4,7 +4,7 @@
 public record GetUsersQuery() : IQuery<IEnumerable<GetUserResult>>;
 
 //Result
-public record GetUserResult(int Id, string UserName, string Name);
+public record GetUserResult(int Id, string UserName, string Name, string Role);
 
 // Handler
 internal class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, IEnumerable<GetUserResult>>
@@ -25,7 +25,7 @@ internal class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, IEnumerable<G
             return Enumerable.Empty<GetUserResult>();
         }
 
-        return users.Select(u => new GetUserResult(u.Id, u.UserName, u.Name)).ToList();
+        return users.Select(u => new GetUserResult(u.Id, u.UserName, u.Name, u.Role)).ToList();
     }
 }
 
@@ -47,7 +47,10 @@ public class UsersGetEndpoint : ICarterModule
 
             return Results.Ok(response);
         })
+        .RequireAuthorization("AdminOnly")
         .Produces<APIResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithName("GetUsers")
         .WithSummary("Get Users")

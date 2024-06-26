@@ -1,10 +1,10 @@
 ﻿namespace CraApp.Features.UserFeature;
 
 // Command
-public record CreateUserCommand(string UserName, string Name) : ICommand<CreateUserResult>;
+public record CreateUserCommand(string UserName, string Name, string Password, string Role) : ICommand<CreateUserResult>;
 
 // Result
-public record CreateUserResult(int Id, string UserName, string Name);
+public record CreateUserResult(int Id, string UserName, string Name, string Role);
 
 // Handler
 internal class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, CreateUserResult>
@@ -19,7 +19,8 @@ internal class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, Cre
     public async Task<CreateUserResult> Handle(CreateUserCommand command, CancellationToken cancellationToken)
     {
         // Validate the input
-        if (string.IsNullOrWhiteSpace(command.UserName) || string.IsNullOrWhiteSpace(command.Name))
+        if (string.IsNullOrWhiteSpace(command.UserName) || string.IsNullOrWhiteSpace(command.Name) 
+         || string.IsNullOrWhiteSpace(command.Password) || string.IsNullOrWhiteSpace(command.Role))
         {
             throw new ArgumentException("UserName and Name cannot be empty.");
         }
@@ -34,16 +35,17 @@ internal class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, Cre
         var newUser = new User
         {
             UserName = command.UserName,
-            Name = command.Name
+            Name = command.Name,
+            Password = command.Password,
+            Role = command.Role
         };
 
         await _repository.CreateAsync(newUser, cancellationToken);
         await _repository.SaveAsync();
 
-        return new CreateUserResult(newUser.Id, newUser.UserName, newUser.Name);
+        return new CreateUserResult(newUser.Id, newUser.UserName, newUser.Name, newUser.Role);
     }
 }
-
 // Endpoint
 public class UsersPostEndpoint : ICarterModule
 {
@@ -84,8 +86,11 @@ public class UsersPostEndpoint : ICarterModule
                 return Results.Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.InternalServerError);
             }
         })
+        .RequireAuthorization("AdminOnly") // Apply the AdminOnly policy
         .Produces<APIResponse>(StatusCodes.Status201Created)
         .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status409Conflict)
         .ProducesProblem(StatusCodes.Status500InternalServerError)
         .WithName("CreateUser")
@@ -93,4 +98,5 @@ public class UsersPostEndpoint : ICarterModule
         .WithDescription("Create a new user");
     }
 }
+
 

@@ -1,7 +1,4 @@
-﻿using CraApp.Data;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace CraApp.Tests.UserTest;
+﻿namespace CraApp.Tests.UserTest;
 
 public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
 {
@@ -19,16 +16,19 @@ public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
     {
         // Arrange
         await ClearDatabaseAsync();
-        var client = _factory.CreateClient();
+        var token = await GetJwtToken();
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // First, create a user to ensure there is a user to delete
-        var newUser = new UserDTO
+        var newUser = new User
         {
-            UserName = "userToDelete1",
-            Name = "User To Delete"
+            UserName = "userToDelete",
+            Name = "name",
+            Password = "Admin123@",
+            Role = "admin",
         };
         var content = JsonContent.Create(newUser);
-        var createResponse = await client.PostAsync("/users", content);
+        var createResponse = await _client.PostAsync("/users", content);
         createResponse.EnsureSuccessStatusCode();
         var createResponseString = await createResponse.Content.ReadAsStringAsync();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
@@ -37,7 +37,7 @@ public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
         var createdUser = JsonSerializer.Deserialize<UserDTO>(jsonElement.GetRawText(), options);
 
         // Act
-        var response = await client.DeleteAsync($"/users/{createdUser.Id}");
+        var response = await _client.DeleteAsync($"/users/{createdUser.Id}");
 
         // Assert
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -49,11 +49,13 @@ public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task DeleteUser_Endpoint_Returns_NotFound_For_NonExistent_User()
     {
         // Arrange
-        var client = _factory.CreateClient();
+        var token = await GetJwtToken();
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        //var client = _factory.CreateClient();
         var nonExistentUserId = 9999; // An ID that doesn't exist
 
         // Act
-        var response = await client.DeleteAsync($"/users/{nonExistentUserId}");
+        var response = await _client.DeleteAsync($"/users/{nonExistentUserId}");
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -64,7 +66,6 @@ public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
         Assert.False(apiResponse.IsSuccess);
         Assert.NotEmpty(apiResponse.ErrorsMessages ?? new List<string>());
     }
-
 
     public void Dispose()
     {
@@ -81,5 +82,32 @@ public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
             await dbContext.Database.EnsureDeletedAsync();
             await dbContext.Database.EnsureCreatedAsync();
         }
+    }
+
+    private async Task<string> GetJwtToken()
+    {
+        var loginRequest = new
+        {
+            UserName = "shiinoo",
+            Password = "Password123#"
+        };
+
+        var response = await _client.PostAsJsonAsync("/login", loginRequest);
+        response.EnsureSuccessStatusCode();
+
+        var responseString = await response.Content.ReadAsStringAsync();
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        var apiResponse = JsonSerializer.Deserialize<APIResponse>(responseString, options);
+
+        if (apiResponse?.Result != null)
+        {
+            var loginResponse = JsonSerializer.Deserialize<LoginResponseDTO>(apiResponse.Result.ToString(), options);
+            return loginResponse?.Token;
+        }
+
+        throw new InvalidOperationException("Failed to retrieve JWT token");
     }
 }
