@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240624131640_AddInitialTables")]
-    partial class AddInitialTables
+    [Migration("20240625144834_reloadDb")]
+    partial class reloadDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,6 +45,15 @@ namespace CraApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Activities");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            EndTime = new TimeSpan(0, 18, 0, 0, 0),
+                            Project = 1,
+                            StartTime = new TimeSpan(0, 10, 0, 0, 0)
+                        });
                 });
 
             modelBuilder.Entity("CraApp.Model.User", b =>
@@ -56,24 +65,38 @@ namespace CraApp.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Ahmed",
+                            Password = "Password123#",
+                            Role = "admin",
+                            UserName = "shiinoo"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Marouane",
+                            Password = "Password123#",
+                            Role = "admin",
+                            UserName = "PipInstallGeek"
+                        });
                 });
 #pragma warning restore 612, 618
         }

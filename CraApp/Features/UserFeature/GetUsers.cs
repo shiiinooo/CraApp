@@ -1,10 +1,10 @@
-﻿namespace CraApp.Features.User;
+﻿namespace CraApp.Features.UserFeature;
 
 // Query
 public record GetUsersQuery() : IQuery<IEnumerable<GetUserResult>>;
 
 //Result
-public record GetUserResult(int Id, string UserName, string Name);
+public record GetUserResult(int Id, string UserName, string Name, string Role);
 
 // Handler
 internal class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, IEnumerable<GetUserResult>>
@@ -20,12 +20,18 @@ internal class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, IEnumerable<G
     {
         var users = await _repository.GetAllAsync(cancellationToken);
 
-        return users.Select(u => new GetUserResult(u.Id, u.UserName, u.Name)).ToList();
+        if (users == null || !users.Any())
+        {
+            return Enumerable.Empty<GetUserResult>();
+        }
+
+        return users.Select(u => new GetUserResult(u.Id, u.UserName, u.Name, u.Role)).ToList();
     }
 }
 
+
 // Endpoint
-public class UsersEndpoint : ICarterModule
+public class UsersGetEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
@@ -35,17 +41,16 @@ public class UsersEndpoint : ICarterModule
             var query = new GetUsersQuery();
             var users = await sender.Send(query);
 
-            if (users == null || !users.Any())
-            {
-                return Results.NotFound();
-            }
-
             response.Result = users;
             response.IsSuccess = true;
-            response.StatusCode = HttpStatusCode.OK;
+            response.StatusCode = users.Any() ? HttpStatusCode.OK : HttpStatusCode.NotFound;
+
             return Results.Ok(response);
         })
+        .RequireAuthorization("AdminOnly")
         .Produces<APIResponse>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status403Forbidden)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithName("GetUsers")
         .WithSummary("Get Users")
