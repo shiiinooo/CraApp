@@ -40,7 +40,7 @@ public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
         var response = await _client.DeleteAsync($"/users/{createdUser.Id}");
 
         // Assert
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         await ClearDatabaseAsync();
         _client.Dispose();
     }

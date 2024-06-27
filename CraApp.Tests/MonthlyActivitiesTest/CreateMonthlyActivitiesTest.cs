@@ -52,6 +52,7 @@ public class CreateMonthlyActivitiesTest
         
         var _createdMonthlyActivities = await Helper.Post(_monthlyActivitiesDTO, url,_client);
        
+
         Assert.Equal(HttpStatusCode.NoContent, Helper._APIResponse.StatusCode);
         Assert.NotNull(Helper._APIResponse.Result);
         Assert.True(Helper._APIResponse.IsSuccess);

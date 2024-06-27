@@ -28,4 +28,13 @@ public class UserRepository : Repository<User>, IUserRepository
         _db.Entry(user).State = EntityState.Modified;
         await _db.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<User> GetByIdWithActivitiesAsync(int userId, CancellationToken cancellationToken)
+    {
+        return await _db.Set<User>()
+            .Include(u => u.MonthlyActivities)
+                .ThenInclude(ma => ma.Activities)
+            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+    }
+
 }

@@ -4,6 +4,7 @@ using CraApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240626161835_reloadDB")]
+    partial class reloadDB
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,15 +66,10 @@ namespace CraApp.Migrations
                     b.Property<int>("Month")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("MonthlyActivities");
                 });
@@ -132,23 +130,7 @@ namespace CraApp.Migrations
 
             modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
                 {
-                    b.HasOne("CraApp.Model.User", "User")
-                        .WithMany("MonthlyActivities")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
-                {
                     b.Navigation("Activities");
-                });
-
-            modelBuilder.Entity("CraApp.Model.User", b =>
-                {
-                    b.Navigation("MonthlyActivities");
                 });
 #pragma warning restore 612, 618
         }

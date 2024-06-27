@@ -1,4 +1,5 @@
-﻿using MapsterMapper;
+﻿using CraApp.Web.Services;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,11 +7,13 @@ namespace CraApp.Web.Controllers;
 
 public class UserController : Controller
 {
-    private readonly IUserService _villaService;
+    private readonly IUserService _userService;
+    private readonly IAuthService _authService;
     private readonly IMapper _mapper;
-    public UserController(IUserService villaService, IMapper mapper)
+    public UserController(IUserService userService, IAuthService authService, IMapper mapper)
     {
-        _villaService = villaService;
+        _userService = userService;
+        _authService = authService;
         _mapper = mapper;
     }
 
@@ -18,40 +21,39 @@ public class UserController : Controller
     {
         List<UserDTO> list = new();
 
-        var response = await _villaService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
+        var response = await _userService.GetAllAsync<APIResponse>(HttpContext.Session.GetString(SD.SessionToken));
         if (response != null && response.IsSuccess)
         {
             list = JsonConvert.DeserializeObject<List<UserDTO>>(Convert.ToString(response.Result));
         }
         return View(list);
     }
+    
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> CreateUser()
     {
         return View();
     }
+   
     [Authorize(Roles = "admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateUser(UserCreateDTO model)
+    public async Task<IActionResult> CreateUser(RegisterationRequestDTO model)
     {
-        if (ModelState.IsValid)
+        APIResponse result = await _authService.RegisterAsync<APIResponse>(model);
+        if (result != null && result.IsSuccess)
         {
-
-            var response = await _villaService.CreateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
-            if (response != null && response.IsSuccess)
-            {
-                TempData["success"] = "Villa created successfully";
-                return RedirectToAction(nameof(IndexUser));
-            }
+            TempData["success"] = "User created successfully";
+            return RedirectToAction("IndexUser");
         }
         TempData["error"] = "Error encountered.";
         return View(model);
     }
+    
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> UpdateUser(int villaId)
+    public async Task<IActionResult> UpdateUser(int userId)
     {
-        var response = await _villaService.GetAsync<APIResponse>(villaId, HttpContext.Session.GetString(SD.SessionToken));
+        var response = await _userService.GetAsync<APIResponse>(userId, HttpContext.Session.GetString(SD.SessionToken));
         if (response != null && response.IsSuccess)
         {
 
@@ -60,6 +62,7 @@ public class UserController : Controller
         }
         return NotFound();
     }
+    
     [Authorize(Roles = "admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -67,8 +70,8 @@ public class UserController : Controller
     {
         if (ModelState.IsValid)
         {
-            TempData["success"] = "Villa updated successfully";
-            var response = await _villaService.UpdateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
+            TempData["success"] = "User updated successfully";
+            var response = await _userService.UpdateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
             if (response != null && response.IsSuccess)
             {
                 return RedirectToAction(nameof(IndexUser));
@@ -77,10 +80,11 @@ public class UserController : Controller
         TempData["error"] = "Error encountered.";
         return View(model);
     }
+   
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> DeleteUser(int villaId)
+    public async Task<IActionResult> DeleteUser(int userId)
     {
-        var response = await _villaService.GetAsync<APIResponse>(villaId, HttpContext.Session.GetString(SD.SessionToken));
+        var response = await _userService.GetAsync<APIResponse>(userId, HttpContext.Session.GetString(SD.SessionToken));
         if (response != null && response.IsSuccess)
         {
             UserDTO model = JsonConvert.DeserializeObject<UserDTO>(Convert.ToString(response.Result));
@@ -88,16 +92,17 @@ public class UserController : Controller
         }
         return NotFound();
     }
+    
     [Authorize(Roles = "admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteVilla(UserDTO model)
+    public async Task<IActionResult> DeleteUser(UserDTO model)
     {
 
-        var response = await _villaService.DeleteAsync<APIResponse>(model.Id, HttpContext.Session.GetString(SD.SessionToken));
+        var response = await _userService.DeleteAsync<APIResponse>(model.Id, HttpContext.Session.GetString(SD.SessionToken));
         if (response != null && response.IsSuccess)
         {
-            TempData["success"] = "Villa deleted successfully";
+            TempData["success"] = "User deleted successfully";
             return RedirectToAction(nameof(IndexUser));
         }
         TempData["error"] = "Error encountered.";

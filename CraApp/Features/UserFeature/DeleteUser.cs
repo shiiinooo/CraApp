@@ -23,7 +23,7 @@ internal class DeleteUserCommandHandler : ICommandHandler<DeleteUserCommand>
         }
 
         // Delete the user
-        _repository.DeleteAsync(existingUser);
+        await _repository.DeleteAsync(existingUser);
         
 
         return Unit.Value;
@@ -44,7 +44,7 @@ public class UsersDeleteEndpoint : ICarterModule
 
                 response.IsSuccess = true;
                 response.StatusCode = HttpStatusCode.NoContent;
-                return Results.NoContent();
+                return Results.Ok(response);
             }
             catch (KeyNotFoundException ex)
             {

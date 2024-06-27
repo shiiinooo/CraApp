@@ -37,7 +37,8 @@ internal class CreateUserCommandHandler : ICommandHandler<CreateUserCommand, Cre
             UserName = command.UserName,
             Name = command.Name,
             Password = command.Password,
-            Role = command.Role
+            Role = command.Role,
+            MonthlyActivities = new List<Model.MonthlyActivities>()
         };
 
         await _repository.CreateAsync(newUser, cancellationToken);
