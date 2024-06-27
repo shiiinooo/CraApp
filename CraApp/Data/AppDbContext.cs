@@ -48,7 +48,6 @@ public class AppDbContext : DbContext
                 Password = "Password123#",
                 Role = "admin"
             });
-        
     }
 
 }

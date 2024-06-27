@@ -12,27 +12,24 @@ public class DeleteActivity : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/api/acitivity/{Id:int}", DeleteActivityHandler);
+        app.MapDelete("/api/activity/{Id:int}", DeleteActivityHandler);
     }
 
     private async Task<IResult> DeleteActivityHandler(ISender sender, int id)
     {
         APIResponse APIResponse = new();
-        try
+        var result = await sender.Send(new DeleteActivityCommand(id));
+        if (result.IsSuccess)
         {
-           await sender.Send(new DeleteActivityCommand(id));
-
             APIResponse.IsSuccess = true;
             APIResponse.StatusCode = HttpStatusCode.NoContent;
             return Results.Ok(APIResponse);
         }
-        catch (KeyNotFoundException ex)
-        {
-            APIResponse.IsSuccess = false;
-            APIResponse.ErrorsMessages = new List<string> { ex.Message };
-            APIResponse.StatusCode = HttpStatusCode.NotFound;
-            return Results.NotFound(APIResponse);
-        }
+        APIResponse.IsSuccess = false;
+        APIResponse.ErrorsMessages = new List<string> { "Key Not Found "};
+        APIResponse.StatusCode = HttpStatusCode.NotFound;
+        return Results.NotFound(APIResponse);
+
     }
 }
 internal class DeleteActivityHandler(IActivityRepository _activityRepository) : ICommandHandler<DeleteActivityCommand, DeleteActivityResult>
