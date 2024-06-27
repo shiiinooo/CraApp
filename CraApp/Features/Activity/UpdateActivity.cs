@@ -2,7 +2,7 @@
 namespace CraApp.Features.Activity;
 
 public record UpdateActivityCommand(int Id, TimeSpan StartTime, TimeSpan EndTime, int Day, String Project, int MonthlyActivitiesId) : ICommand<UpdateActivityResult>;
-public record UpdateActivityResult(int Id, TimeSpan StartTime, TimeSpan EndTime, int Day, String Project);
+public record UpdateActivityResult(int Id, TimeSpan StartTime, TimeSpan EndTime, int Day, String Project, int MonthlyActivitiesId);
 
 public class UpdateActivity : ICarterModule 
 {
@@ -46,7 +46,7 @@ internal class UpdateActivityHandler(IActivityRepository _repo) : ICommandHandle
 
         await _repo.SaveAsync();
         
-        return new UpdateActivityResult(activity.Id, activity.StartTime, activity.EndTime, activity.Day, activity.Project.ToString());
+        return new UpdateActivityResult(activity.Id, activity.StartTime, activity.EndTime, activity.Day, activity.Project.ToString(), activity.MonthlyActivitiesId);
 
     }
 }

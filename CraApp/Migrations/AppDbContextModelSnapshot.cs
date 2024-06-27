@@ -50,17 +50,6 @@ namespace CraApp.Migrations
                     b.HasIndex("MonthlyActivitiesId");
 
                     b.ToTable("Activities");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Day = 1,
-                            EndTime = new TimeSpan(0, 18, 0, 0, 0),
-                            MonthlyActivitiesId = 0,
-                            Project = 1,
-                            StartTime = new TimeSpan(0, 10, 0, 0, 0)
-                        });
                 });
 
             modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>

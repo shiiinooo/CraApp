@@ -1,4 +1,7 @@
 ﻿
+using System;
+using CraApp.Tests.Util;
+
 namespace CraApp.Tests.MonthlyActivitiesTest;
 
 
@@ -7,14 +10,13 @@ public class CreateMonthlyActivitiesTest
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
-    private APIResponse _APIResponse;
-    MonthlyActivitiesDTO _monthlyActivitiesDTO;
+    private MonthlyActivitiesDTO _monthlyActivitiesDTO;
+    private readonly string url = "/api/monthlyActivities";
 
     public CreateMonthlyActivitiesTest()
     {
         _factory = new WebApplicationFactory<Program>();
         _client = _factory.CreateClient();
-        _APIResponse = new APIResponse();
         _monthlyActivitiesDTO = new MonthlyActivitiesDTO
         {
             Year = 2024,
@@ -41,43 +43,18 @@ public class CreateMonthlyActivitiesTest
         };
     }
 
-    public async Task<MonthlyActivitiesDTO> RequestHandler(MonthlyActivitiesDTO _monthlyactivities)
-    {
-
-
-        var content = JsonContent.Create(_monthlyactivities);
-
-        var response = await _client.PostAsync("/api/monthlyActivities", content);
-
-        var result = await response.Content.ReadAsStringAsync();
-
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-
-        _APIResponse = JsonSerializer.Deserialize<APIResponse>(result, options);
-        if (_APIResponse.Result is not null)
-        {
-            var jsonElement = (JsonElement)_APIResponse.Result;
-            var createdActivity = JsonSerializer.Deserialize<MonthlyActivitiesDTO>(jsonElement.GetRawText(), options);
-            return createdActivity;
-        }
-        return new MonthlyActivitiesDTO();
-
-
-    }
+   
 
     [Fact]
     public async void Should_Save_Monthly_Activities()
     {
-       
 
-        var _createdMonthlyActivities = await RequestHandler(_monthlyActivitiesDTO);
+        
+        var _createdMonthlyActivities = await Helper.Post(_monthlyActivitiesDTO, url,_client);
        
-        Assert.Equal(HttpStatusCode.Created, _APIResponse.StatusCode);
-        Assert.NotNull(_APIResponse.Result);
-        Assert.True(_APIResponse.IsSuccess);
+        Assert.Equal(HttpStatusCode.NoContent, Helper._APIResponse.StatusCode);
+        Assert.NotNull(Helper._APIResponse.Result);
+        Assert.True(Helper._APIResponse.IsSuccess);
 
         Assert.Equal(_createdMonthlyActivities.Year, _monthlyActivitiesDTO.Year);
         Assert.Equal(_createdMonthlyActivities.Month, _monthlyActivitiesDTO.Month);
@@ -95,11 +72,11 @@ public class CreateMonthlyActivitiesTest
             MonthlyActivitiesId = 1
         });
 
-        var _createdMonthlyActivities = await RequestHandler(_monthlyActivitiesDTO);
+        var _createdMonthlyActivities = await Helper.Post(_monthlyActivitiesDTO, url, _client);
 
-        Assert.True(!_APIResponse.IsSuccess);
-        Assert.Null(_APIResponse.Result);
-        Assert.NotNull(_APIResponse.ErrorsMessages);
-        Assert.Equal("Day cannot exceded month max number of days or be less than zero. ", _APIResponse.ErrorsMessages.First());
+        Assert.True(!Helper._APIResponse.IsSuccess);
+        Assert.Null(Helper._APIResponse.Result);
+        Assert.NotNull(Helper._APIResponse.ErrorsMessages);
+        Assert.Equal("Day cannot exceded month max number of days or be less than zero. ", Helper._APIResponse.ErrorsMessages.First());
     }
 }

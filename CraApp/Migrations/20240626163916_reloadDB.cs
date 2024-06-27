@@ -8,24 +8,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CraApp.Migrations
 {
     /// <inheritdoc />
-    public partial class reloadDb : Migration
+    public partial class reloadDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Activities",
+                name: "MonthlyActivities",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    Project = table.Column<int>(type: "int", nullable: false)
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    Month = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Activities", x => x.Id);
+                    table.PrimaryKey("PK_MonthlyActivities", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -44,10 +43,28 @@ namespace CraApp.Migrations
                     table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Activities",
-                columns: new[] { "Id", "EndTime", "Project", "StartTime" },
-                values: new object[] { 1, new TimeSpan(0, 18, 0, 0, 0), 1, new TimeSpan(0, 10, 0, 0, 0) });
+            migrationBuilder.CreateTable(
+                name: "Activities",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartTime = table.Column<TimeSpan>(type: "time(0)", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "time(0)", nullable: false),
+                    Day = table.Column<int>(type: "int", nullable: false),
+                    Project = table.Column<int>(type: "int", nullable: false),
+                    MonthlyActivitiesId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Activities", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Activities_MonthlyActivities_MonthlyActivitiesId",
+                        column: x => x.MonthlyActivitiesId,
+                        principalTable: "MonthlyActivities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.InsertData(
                 table: "Users",
@@ -57,6 +74,11 @@ namespace CraApp.Migrations
                     { 1, "Ahmed", "Password123#", "admin", "shiinoo" },
                     { 2, "Marouane", "Password123#", "admin", "PipInstallGeek" }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Activities_MonthlyActivitiesId",
+                table: "Activities",
+                column: "MonthlyActivitiesId");
         }
 
         /// <inheritdoc />
@@ -67,6 +89,9 @@ namespace CraApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "MonthlyActivities");
         }
     }
 }

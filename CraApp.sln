@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CraApp", "CraApp\CraApp.csp
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{AA18B1C2-BA94-4457-A07B-C6A1A07306F6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CraApp.Web", "..\CraApp.Web\CraApp.Web.csproj", "{6BE2546F-C4B2-4F5C-B98F-D7DB5FD9D083}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CraApp.Web", "CraApp.Web\CraApp.Web.csproj", "{6BE2546F-C4B2-4F5C-B98F-D7DB5FD9D083}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
