@@ -3,8 +3,8 @@ using CraApp.Model;
 using CraApp.Model.DTO;
 
 namespace CraApp.Features.MonthlyActivities;
-public record UpdateMonthlyActivitiesCommand(int Id, int Year, int Month, ICollection<ActivityDTO> Activities) : ICommand<UpdateMonthlyActivitiesResult>;
-public record UpdateMonthlyActivitiesResult(int Id, int year, int month);
+public record UpdateMonthlyActivitiesCommand(int Id, int Year, int Month, ICollection<ActivityDTO> Activities, int UserId) : ICommand<UpdateMonthlyActivitiesResult>;
+public record UpdateMonthlyActivitiesResult(int Id, int year, int month, ICollection<ActivityDTO> Activities, int UserId);
 public class UpdateMonthlyActivities : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -66,6 +66,6 @@ internal class UpdateMonthlyActivitiesHandler(IMonthlyActivitiesRepository _mont
 
         await _monthlyActivitiesRepository.SaveAsync();
 
-        return new UpdateMonthlyActivitiesResult(monthlyActivities.Id, monthlyActivities.Year, monthlyActivities.Month);
+        return new UpdateMonthlyActivitiesResult(monthlyActivities.Id, monthlyActivities.Year, monthlyActivities.Month, monthlyActivities.Activities.Adapt<ICollection<ActivityDTO>>(), monthlyActivities.UserId);
     }
 }

@@ -3,8 +3,8 @@ using static CraApp.Features.Activity.CreateActivity;
 
 namespace CraApp.Features.MonthlyActivities;
 
-public record CreateMonthlyActivitiesCommand(int Year, int Month, ICollection<ActivityDTO> Activities) : ICommand<CreateMonthlyActivitiesResult>;
-public record CreateMonthlyActivitiesResult(int id, int year, int month, ICollection<ActivityDTO> Activities);
+public record CreateMonthlyActivitiesCommand(int Id, int Year, int Month, ICollection<ActivityDTO> Activities,int UserId) : ICommand<CreateMonthlyActivitiesResult>;
+public record CreateMonthlyActivitiesResult(int id, int year, int month, ICollection<ActivityDTO> Activities, int UserId);
 public class CreateMonthlyActivities : ICarterModule
 {
    
@@ -61,6 +61,6 @@ internal class CreateMonthlyActivitiesHandler : ICommandHandler<CreateMonthlyAct
     {
         var montlyActivities = command.Adapt<Model.MonthlyActivities>();
         await _monthlyActivitiesRepository.CreateAsync(montlyActivities, cancellationToken);
-        return new CreateMonthlyActivitiesResult(montlyActivities.Id, montlyActivities.Year, montlyActivities.Month, montlyActivities.Activities.Adapt<ICollection<ActivityDTO>>());
+        return new CreateMonthlyActivitiesResult(montlyActivities.Id, montlyActivities.Year, montlyActivities.Month, montlyActivities.Activities.Adapt<ICollection<ActivityDTO>>(), montlyActivities.UserId);
     }
 }
