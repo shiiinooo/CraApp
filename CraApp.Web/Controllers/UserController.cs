@@ -126,7 +126,7 @@ public class UserController : Controller
         var activitiesResponse = await _userService.GetUserWithActivitiesAsync<APIResponse>(userId, HttpContext.Session.GetString(SD.SessionToken));
         if (activitiesResponse != null && activitiesResponse.IsSuccess)
         {
-            var monthlyActivities = JsonConvert.DeserializeObject<List<MonthlyActivityDTO>>(Convert.ToString(activitiesResponse.Result));
+            var monthlyActivities = JsonConvert.DeserializeObject<List<MonthlyActivitiesDTO>>(Convert.ToString(activitiesResponse.Result));
             var userWithActivities = new UserWithActivitiesDTO
             {
                 Id = user.Id,

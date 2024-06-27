@@ -1,0 +1,39 @@
+﻿@model IEnumerable<CraApp.Web.Models.Dto.MonthlyActivitiesDTO>
+
+<br />
+<div class="container p-4 border">
+    <div class="row pb-2">
+        <div class="col">
+            <h1 class="text-primary">Monthly Activities List</h1>
+        </div>
+        <div class="col text-end pt-1">
+            <a asp-controller="MonthlyActivities" asp-action="CreateMonthlyActivities" class="btn btn-outline-primary"><i class="bi bi-plus-square-fill"></i> Create New Monthly Activity</a>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Month</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Year</td>
+                    <td>
+                        <a asp-controller="MonthlyActivities" asp-action="ActivitiesByMonthAndUser" asp-route-userId="@item.Id" asp-route-month="@item.Month">@item.Month</a>
+                    </td>
+                   
+                    <td>
+                        <a asp-controller="MonthlyActivities" asp-action="UpdateMonthlyActivities" asp-route-id="@item.Id" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+                        <a asp-controller="MonthlyActivities" asp-action="DeleteMonthlyActivities" asp-route-id="@item.Id" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -12,7 +12,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpClient<IUserService, UserService>();
 builder.Services.AddScoped<IUserService, UserService>();
-
+builder.Services.AddHttpClient<IMonthlyActivitiesService, MonthlyActivitiesService>();
+builder.Services.AddScoped<IMonthlyActivitiesService, MonthlyActivitiesService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddHttpClient<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthService, AuthService>();

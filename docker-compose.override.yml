@@ -7,16 +7,26 @@ services:
         environment:
         - ACCEPT_EULA=Y
         - MSSQL_SA_PASSWORD=Password@12345#
-
+        volumes:
+            - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+            - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
     craapp:
         environment:
             - ASPNETCORE_ENVIRONMENT=Development
             - ASPNETCORE_HTTP_PORTS=8080
             - ASPNETCORE_HTTPS_PORTS=8081
-            - ConnectionStrings__DefaultSQLConnection=Server=db;Database=Biblio;User Id=sa;Password=Password@12345#;TrustServerCertificate=True;MultipleActiveResultSets=true;
+            - ASPNETCORE_URLS=http://+:8080
+            - ConnectionStrings__DefaultSQLConnection=Server=db;Database=CRA;User Id=sa;Password=Password@12345#;TrustServerCertificate=True;MultipleActiveResultSets=true;
         ports:
             - "8080:8080"
             - "8081:8081"
-        volumes:
-            - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-            - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+
+    craapp.web:
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - ASPNETCORE_HTTP_PORTS=8080
+            # - ASPNETCORE_HTTPS_PORTS=8081
+            - ServiceUrls__CraAPI=http://craapp:8080
+        ports:
+            - "1234:8080"
+            # - "1235:8081"

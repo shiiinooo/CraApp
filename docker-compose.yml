@@ -8,3 +8,9 @@ services:
     build:
       context: .
       dockerfile: CraApp/Dockerfile
+  craapp.web:
+    image: ${DOCKER_REGISTRY-}craappweb
+    build:
+      context: .
+      dockerfile: CraApp.Web/Dockerfile
+
