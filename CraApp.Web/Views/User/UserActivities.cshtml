@@ -1,0 +1,53 @@
+﻿@model CraApp.Web.Models.Dto.UserWithActivitiesDTO
+
+<div class="container p-4 border">
+    <h1 class="text-primary">@Model.Name's Monthly Activities</h1>
+
+    @if (Model.MonthlyActivities == null || !Model.MonthlyActivities.Any())
+    {
+        <p>No monthly activities found for this user.</p>
+    }
+    else
+    {
+        @foreach (var activity in Model.MonthlyActivities)
+        {
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h3>@activity.Year-@activity.Month.ToString("D2")</h3>
+                </div>
+                <div class="card-body">
+                    @if (activity.Activities == null || !activity.Activities.Any())
+                    {
+                        <p>No activities found for this month.</p>
+                    }
+                    else
+                    {
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Project</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var act in activity.Activities)
+                                {
+                                    <tr>
+                                        <td>@act.Day</td>
+                                        <td>@act.StartTime</td>
+                                        <td>@act.EndTime</td>
+                                        <td>@act.Project</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        }
+    }
+
+    <a asp-controller="User" asp-action="IndexUser" class="btn btn-primary">Back to User List</a>
+</div>
