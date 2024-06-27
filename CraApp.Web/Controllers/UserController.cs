@@ -109,4 +109,39 @@ public class UserController : Controller
         return View(model);
     }
 
+
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> UserActivities(int userId)
+    {
+        // Fetch the user details
+        var userResponse = await _userService.GetAsync<APIResponse>(userId, HttpContext.Session.GetString(SD.SessionToken));
+        if (userResponse == null || !userResponse.IsSuccess)
+        {
+            return NotFound();
+        }
+
+        var user = JsonConvert.DeserializeObject<UserDTO>(Convert.ToString(userResponse.Result));
+
+        // Fetch the user's activities
+        var activitiesResponse = await _userService.GetUserWithActivitiesAsync<APIResponse>(userId, HttpContext.Session.GetString(SD.SessionToken));
+        if (activitiesResponse != null && activitiesResponse.IsSuccess)
+        {
+            var monthlyActivities = JsonConvert.DeserializeObject<List<MonthlyActivityDTO>>(Convert.ToString(activitiesResponse.Result));
+            var userWithActivities = new UserWithActivitiesDTO
+            {
+                Id = user.Id,
+                Name = user.Name,
+                UserName = user.UserName,
+                Role = user.Role,
+                MonthlyActivities = monthlyActivities
+            };
+            return View(userWithActivities);
+        }
+
+        return NotFound();
+    }
+
+
+
+
 }

@@ -64,4 +64,14 @@ public class UserService : BaseService, IUserService
         });
     }
 
+    public Task<T> GetUserWithActivitiesAsync<T>(int userId, string token)
+    {
+        return SendAsync<T>(new APIRequest()
+        {
+            ApiType = SD.ApiType.GET,
+            Url = villaUrl + "/users/" + userId + "/monthly-activities",
+            Token = token
+        });
+    }
+
 }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240626161835_reloadDB")]
+    [Migration("20240627110604_reloadDB")]
     partial class reloadDB
     {
         /// <inheritdoc />
@@ -66,10 +66,15 @@ namespace CraApp.Migrations
                     b.Property<int>("Month")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("MonthlyActivities");
                 });
@@ -130,7 +135,23 @@ namespace CraApp.Migrations
 
             modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
                 {
+                    b.HasOne("CraApp.Model.User", "User")
+                        .WithMany("MonthlyActivities")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
+                {
                     b.Navigation("Activities");
+                });
+
+            modelBuilder.Entity("CraApp.Model.User", b =>
+                {
+                    b.Navigation("MonthlyActivities");
                 });
 #pragma warning restore 612, 618
         }
