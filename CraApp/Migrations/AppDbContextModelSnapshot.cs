@@ -50,17 +50,6 @@ namespace CraApp.Migrations
                     b.HasIndex("MonthlyActivitiesId");
 
                     b.ToTable("Activities");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Day = 1,
-                            EndTime = new TimeSpan(0, 18, 0, 0, 0),
-                            MonthlyActivitiesId = 0,
-                            Project = 1,
-                            StartTime = new TimeSpan(0, 10, 0, 0, 0)
-                        });
                 });
 
             modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
@@ -74,10 +63,15 @@ namespace CraApp.Migrations
                     b.Property<int>("Month")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("MonthlyActivities");
                 });
@@ -138,7 +132,23 @@ namespace CraApp.Migrations
 
             modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
                 {
+                    b.HasOne("CraApp.Model.User", "User")
+                        .WithMany("MonthlyActivities")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
+                {
                     b.Navigation("Activities");
+                });
+
+            modelBuilder.Entity("CraApp.Model.User", b =>
+                {
+                    b.Navigation("MonthlyActivities");
                 });
 #pragma warning restore 612, 618
         }

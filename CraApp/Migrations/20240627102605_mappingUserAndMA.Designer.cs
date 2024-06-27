@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240625143538_addingDDate")]
-    partial class addingDDate
+    [Migration("20240627102605_mappingUserAndMA")]
+    partial class mappingUserAndMA
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,31 +33,50 @@ namespace CraApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Day")
+                        .HasColumnType("int");
 
                     b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time");
+                        .HasColumnType("time(0)");
+
+                    b.Property<int>("MonthlyActivitiesId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Project")
                         .HasColumnType("int");
 
                     b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time");
+                        .HasColumnType("time(0)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Activities");
+                    b.HasIndex("MonthlyActivitiesId");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Date = new DateTime(2024, 10, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EndTime = new TimeSpan(0, 18, 0, 0, 0),
-                            Project = 1,
-                            StartTime = new TimeSpan(0, 10, 0, 0, 0)
-                        });
+                    b.ToTable("Activities");
+                });
+
+            modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("MonthlyActivities");
                 });
 
             modelBuilder.Entity("CraApp.Model.User", b =>
@@ -101,6 +120,38 @@ namespace CraApp.Migrations
                             Role = "admin",
                             UserName = "PipInstallGeek"
                         });
+                });
+
+            modelBuilder.Entity("CraApp.Model.Activity", b =>
+                {
+                    b.HasOne("CraApp.Model.MonthlyActivities", "MonthlyActivities")
+                        .WithMany("Activities")
+                        .HasForeignKey("MonthlyActivitiesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MonthlyActivities");
+                });
+
+            modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
+                {
+                    b.HasOne("CraApp.Model.User", "User")
+                        .WithMany("MonthlyActivities")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
+                {
+                    b.Navigation("Activities");
+                });
+
+            modelBuilder.Entity("CraApp.Model.User", b =>
+                {
+                    b.Navigation("MonthlyActivities");
                 });
 #pragma warning restore 612, 618
         }

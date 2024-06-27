@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240625152135_AddingMonthlyActivities")]
-    partial class AddingMonthlyActivities
+    [Migration("20240626161835_reloadDB")]
+    partial class reloadDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,7 +39,7 @@ namespace CraApp.Migrations
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("time(0)");
 
-                    b.Property<int>("MonthlyAID")
+                    b.Property<int>("MonthlyActivitiesId")
                         .HasColumnType("int");
 
                     b.Property<int>("Project")
@@ -50,20 +50,9 @@ namespace CraApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MonthlyAID");
+                    b.HasIndex("MonthlyActivitiesId");
 
                     b.ToTable("Activities");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Day = 1,
-                            EndTime = new TimeSpan(0, 18, 0, 0, 0),
-                            MonthlyAID = 0,
-                            Project = 1,
-                            StartTime = new TimeSpan(0, 10, 0, 0, 0)
-                        });
                 });
 
             modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
@@ -132,7 +121,7 @@ namespace CraApp.Migrations
                 {
                     b.HasOne("CraApp.Model.MonthlyActivities", "MonthlyActivities")
                         .WithMany("Activities")
-                        .HasForeignKey("MonthlyAID")
+                        .HasForeignKey("MonthlyActivitiesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

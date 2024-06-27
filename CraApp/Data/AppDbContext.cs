@@ -28,6 +28,8 @@ public class AppDbContext : DbContext
     {
         modelBuilder.Entity<Activity>().Property(e => e.StartTime).HasColumnType("time(0)");
         modelBuilder.Entity<Activity>().Property(e => e.EndTime).HasColumnType("time(0)");
+        
+
         modelBuilder.Entity<User>().HasData(
 
             new User()
@@ -46,17 +48,7 @@ public class AppDbContext : DbContext
                 Password = "Password123#",
                 Role = "admin"
             });
-        modelBuilder.Entity<Activity>().HasData(
-
-            new Activity()
-            {
-                Id = 1,
-                Project = Project.MyTaraji,
-                StartTime = new TimeSpan(10, 0, 0),
-                EndTime = new TimeSpan(18, 0, 0),
-                Day = 1
-            });
-   
+        
     }
 
 }

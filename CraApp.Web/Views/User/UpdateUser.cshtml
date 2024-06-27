@@ -1,11 +1,12 @@
-﻿@model CraApp.Web.Models.Dto.UserCreateDTO
+﻿@model CraApp.Web.Models.Dto.UserUpdateDTO
 
-<form asp-action="CreateUser">
+<form asp-action="UpdateUser">
     <br />
     <div class="container border p-3">
-        <h1 class="text-primary">Create User</h1>
+        <h1 class="text-primary">Update User</h1>
         <hr />
 
+        <input hidden asp-for="Id" />
         <div class="row">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -33,7 +34,6 @@
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
-
             <div class="col-2">
                 <label asp-for="Role" class="control-label pt-2" style="font-size:20px;"></label>
             </div>
@@ -41,18 +41,17 @@
                 <input asp-for="Role" class="form-control" />
                 <span asp-validation-for="Role" class="text-danger"></span>
             </div>
-
             <div class="col-5 offset-2">
                 <a asp-action="IndexUser" asp-controller="User" class="btn-primary btn form-control ">Back to List</a>
             </div>
             <div class="col-5">
-                <input type="submit" value="Create" class="btn btn-success form-control" />
+                <input type="submit" value="Update" class="btn btn-success form-control" />
             </div>
         </div>
     </div>
 </form>
 
-                
+
 @section Scripts {
-    <partial name="_ValidationScriptsPartial"/>
+    <partial name="_ValidationScriptsPartial" />
 }

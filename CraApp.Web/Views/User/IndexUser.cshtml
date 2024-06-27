@@ -34,8 +34,8 @@
 					<td>@item.Name</td>
 					<td>@item.Role</td>
 					<td>
-						<a asp-controller="User" asp-action="UpdateUser" asp-route-villaId="@item.Id" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
-						<a asp-controller="User" asp-action="DeleteUser" asp-route-villaId="@item.Id" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+						<a asp-controller="User" asp-action="UpdateUser" asp-route-userId="@item.Id" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+						<a asp-controller="User" asp-action="DeleteUser" asp-route-userId="@item.Id" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
 					</td>
 				</tr>
 			}

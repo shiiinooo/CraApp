@@ -75,7 +75,7 @@ public class CreateMonthlyActivitiesTest
 
         var _createdMonthlyActivities = await RequestHandler(_monthlyActivitiesDTO);
        
-        Assert.Equal(HttpStatusCode.Created, _APIResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, _APIResponse.StatusCode);
         Assert.NotNull(_APIResponse.Result);
         Assert.True(_APIResponse.IsSuccess);
 
