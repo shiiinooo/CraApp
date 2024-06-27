@@ -46,16 +46,7 @@ public class AppDbContext : DbContext
                 Password = "Password123#",
                 Role = "admin"
             });
-        modelBuilder.Entity<Activity>().HasData(
-
-            new Activity()
-            {
-                Id = 1,
-                Project = Project.MyTaraji,
-                StartTime = new TimeSpan(10, 0, 0),
-                EndTime = new TimeSpan(18, 0, 0),
-                Day = 1
-            });
+      
    
     }
 
