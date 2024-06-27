@@ -6,5 +6,5 @@ public class UserWithActivitiesDTO
     public string UserName { get; set; }
     public string Name { get; set; }
     public string Role { get; set; }
-    public List<MonthlyActivityDTO> MonthlyActivities { get; set; } = new List<MonthlyActivityDTO>();
+    public List<MonthlyActivitiesDTO> MonthlyActivities { get; set; } = new List<MonthlyActivitiesDTO>();
 }

@@ -28,6 +28,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="IndexUser">User</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="MonthlyActivities" asp-action="IndexMonthlyActivities">Monthly Activities </a>
+                        </li>
                         @if (httpAcc.HttpContext.Session.GetString(SD.SessionToken) != null &&
                         httpAcc.HttpContext.Session.GetString(SD.SessionToken).ToString().Length > 0)
                         {
