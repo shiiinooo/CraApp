@@ -7,4 +7,5 @@ public interface IUserService
     Task<T> CreateAsync<T>(UserCreateDTO dto, string token);
     Task<T> UpdateAsync<T>(UserUpdateDTO dto, string token);
     Task<T> DeleteAsync<T>(int id, string token);
+    Task<T> GetUserWithActivitiesAsync<T>(int userId, string token);
 }
