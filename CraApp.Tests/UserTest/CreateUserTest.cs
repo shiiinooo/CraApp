@@ -178,7 +178,7 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
     {
         var loginRequest = new
         {
-            UserName = "shiinoo", 
+            UserName = "shiinoo",
             Password = "Password123#"
         };
 

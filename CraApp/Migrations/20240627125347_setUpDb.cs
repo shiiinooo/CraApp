@@ -8,25 +8,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CraApp.Migrations
 {
     /// <inheritdoc />
-    public partial class reloadDB : Migration
+    public partial class setUpDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "MonthlyActivities",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Year = table.Column<int>(type: "int", nullable: false),
-                    Month = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MonthlyActivities", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
@@ -41,6 +27,27 @@ namespace CraApp.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MonthlyActivities",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Year = table.Column<int>(type: "int", nullable: false),
+                    Month = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MonthlyActivities", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MonthlyActivities_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -79,6 +86,11 @@ namespace CraApp.Migrations
                 name: "IX_Activities_MonthlyActivitiesId",
                 table: "Activities",
                 column: "MonthlyActivitiesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MonthlyActivities_UserId",
+                table: "MonthlyActivities",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -88,10 +100,10 @@ namespace CraApp.Migrations
                 name: "Activities");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "MonthlyActivities");
 
             migrationBuilder.DropTable(
-                name: "MonthlyActivities");
+                name: "Users");
         }
     }
 }

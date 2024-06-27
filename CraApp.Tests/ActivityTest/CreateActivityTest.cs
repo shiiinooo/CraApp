@@ -13,6 +13,7 @@ public class CreateActivityTest
     {
         _factory = new WebApplicationFactory<Program>();
         _client = _factory.CreateClient();
+        
     }
 
     
@@ -21,7 +22,9 @@ public class CreateActivityTest
     [Fact]
     public async void Should_Save_Activity()
 {
-    ActivityDTO _activity = new ActivityDTO
+
+        await Helper.PopulateDataBase(_client);
+        ActivityDTO _activity = new ActivityDTO
     {
         Project = Project.MyTaraji.ToString(),
         StartTime = new TimeSpan(10, 0, 0),

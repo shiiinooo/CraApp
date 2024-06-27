@@ -70,7 +70,7 @@ public class CreateMonthlyActivitiesTest
             StartTime = new TimeSpan(10, 0, 0),
             EndTime = new TimeSpan(18, 0, 0),
             Day = -4,
-            MonthlyActivitiesId = 1
+            MonthlyActivitiesId = 1, 
         });
 
         var _createdMonthlyActivities = await Helper.Post(_monthlyActivitiesDTO, url, _client);
