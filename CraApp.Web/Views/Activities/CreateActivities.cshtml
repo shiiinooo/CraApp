@@ -1,0 +1,56 @@
+﻿@model CraApp.Web.Models.Dto.ActivityCreateDTO
+
+<form asp-action="CreateActivities">
+    <br />
+    <div class="container border p-3">
+        <h1 class="text-primary">Create Activity</h1>
+        <hr />
+
+        <div class="row">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="col-2">
+                <label asp-for="StartTime" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="StartTime" class="form-control" />
+                <span asp-validation-for="StartTime" class="text-danger"></span>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="EndTime" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="EndTime" class="form-control" />
+                <span asp-validation-for="EndTime" class="text-danger"></span>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Day" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Day" class="form-control" />
+                <span asp-validation-for="Day" class="text-danger"></span>
+            </div>
+
+            <div class="col-2">
+                <label asp-for="Project" class="control-label pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Project" class="form-control" />
+                <span asp-validation-for="Project" class="text-danger"></span>
+            </div>
+
+            <div class="col-5 offset-2">
+                <a asp-action="IndexMonthlyActivities" asp-controller="MonthlyActivities" class="btn-primary btn form-control ">Back to List</a>
+            </div>
+            <div class="col-5">
+                <input type="submit" value="Create" class="btn btn-success form-control" />
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

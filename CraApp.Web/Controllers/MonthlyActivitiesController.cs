@@ -31,17 +31,18 @@ public class MonthlyActivitiesController : Controller
         return View(list);
     }
 
-    [Authorize(Roles = "admin")]
-    public async Task<IActionResult> CreateMonthlyActivity()
+    //[Authorize(Roles = "admin")]
+    public async Task<IActionResult> CreateMonthlyActivities()
     {
         return View();
     }
 
-    [Authorize(Roles = "admin")]
+    //[Authorize(Roles = "admin")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateMonthlyActivity(MonthlyActivityCreateDTO model)
+    public async Task<IActionResult> CreateMonthlyActivities(MonthlyActivityCreateDTO model)
     {
+        model.UserId = SD.UserId;
         var response = await _monthlyActivityService.CreateAsync<APIResponse>(model, HttpContext.Session.GetString(SD.SessionToken));
         if (response != null && response.IsSuccess)
         {
@@ -110,20 +111,70 @@ public class MonthlyActivitiesController : Controller
     }
 
 
-   // [Authorize(Roles = "admin")]
-    public async Task<IActionResult> ActivitiesByMonthAndUser(int userId, int month)
+    // [Authorize(Roles = "admin")]
+    public async Task<IActionResult> ActivitiesByMonthAndUser()
     {
-        var response = await _monthlyActivityService.GetActivitiesByMonthAndUser<APIResponse>(userId, month, HttpContext.Session.GetString(SD.SessionToken));
+        var response = await _monthlyActivityService.GetActivitiesByMonthAndUser<APIResponse>(SD.UserId, SD.MonthlyActivitiesMonth, HttpContext.Session.GetString(SD.SessionToken));
+
+        List<ActivityDTO> activitiesDTO = new List<ActivityDTO>();
 
         if (response != null && response.IsSuccess)
         {
-            var activitiesDTO = JsonConvert.DeserializeObject<IEnumerable<MonthlyActivitiesDTO>>(Convert.ToString(response.Result));
-            return View(activitiesDTO);
+            var converted = Convert.ToString(response.Result);
+
+            // Deserialize to List<MonthlyActivitiesDTO>
+            var monthlyActivitiesDTO = JsonConvert.DeserializeObject<List<MonthlyActivitiesDTO>>(converted);
+
+            if (monthlyActivitiesDTO != null)
+            {
+                // Extract activities
+                activitiesDTO = monthlyActivitiesDTO.SelectMany(ma => ma.Activities).ToList();
+            }
+        }
+        else
+        {
+            TempData["error"] = response?.ErrorMessages?.FirstOrDefault() ?? "No activities found for this user and month.";
         }
 
-        TempData["error"] = "No activities found for this user and month.";
-        return RedirectToAction(nameof(IndexMonthlyActivities));
+        return View(activitiesDTO);
     }
+
+    public IActionResult SetMonthlyActivitiesId(int id, int month)
+    {
+        SD.MonthlyActivitiesId = id;
+        SD.MonthlyActivitiesMonth = month;
+        return RedirectToAction(nameof(ActivitiesByMonthAndUser));
+    }
+
+    /*public async Task<IActionResult> ActivitiesByMonthAndUser(int userId, int month)
+    {
+        var response = await _monthlyActivityService.GetActivitiesByMonthAndUser<APIResponse>(userId, month, HttpContext.Session.GetString(SD.SessionToken));
+
+        List<ActivityDTO> activitiesDTO = new List<ActivityDTO>();
+
+        if (response != null && response.IsSuccess)
+        {
+            var converted = Convert.ToString(response.Result);
+
+            // Deserialize to List<MonthlyActivitiesDTO>
+            var monthlyActivitiesDTO = JsonConvert.DeserializeObject<List<MonthlyActivitiesDTO>>(converted);
+
+            if (monthlyActivitiesDTO != null)
+            {
+                // Extract activities
+                activitiesDTO = monthlyActivitiesDTO.SelectMany(ma => ma.Activities).ToList();
+            }
+        }
+        else
+        {
+            TempData["error"] = response?.ErrorMessages?.FirstOrDefault() ?? "No activities found for this user and month.";
+        }
+
+        return View(activitiesDTO);
+    }*/
+
+
+
 
 
 

@@ -17,6 +17,9 @@ builder.Services.AddScoped<IMonthlyActivitiesService, MonthlyActivitiesService>(
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddHttpClient<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpClient<IActivityService, ActivityService>();
+builder.Services.AddScoped<IActivityService, ActivityService>();
+
 
 // ------------ Register Mapster --------------
 var config = TypeAdapterConfig.GlobalSettings;
