@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CraApp.Web.Models.Dto.MonthlyActivitiesDTO>
+﻿@* @model IEnumerable<CraApp.Web.Models.Dto.MonthlyActivitiesDTO>
 
 <br />
 <div class="container p-4 border">
@@ -31,6 +31,50 @@
                     <td>
                         <a asp-controller="MonthlyActivities" asp-action="UpdateMonthlyActivities" asp-route-id="@item.Id" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
                         <a asp-controller="MonthlyActivities" asp-action="DeleteMonthlyActivities" asp-route-id="@item.Id" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+ *@
+@model IEnumerable<CraApp.Web.Models.Dto.MonthlyActivitiesDTO>
+
+<br />
+<div class="container p-4 border">
+    <div class="row pb-2">
+        <div class="col">
+            <h1 class="text-primary">Monthly Activities List</h1>
+        </div>
+        <div class="col text-end pt-1">
+            <a asp-controller="MonthlyActivities" asp-action="CreateMonthlyActivities" class="btn btn-outline-primary"><i class="bi bi-plus-square-fill"></i> Create New Monthly Activity</a>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Month</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Year</td>
+                    <td>
+                        <!-- Form to set MonthlyActivitiesId and Month -->
+                        <form asp-controller="MonthlyActivities" asp-action="SetMonthlyActivitiesId" method="post">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <input type="hidden" name="month" value="@item.Month" />
+                            <button type="submit" class="btn-link">@item.Month</button>
+                        </form>
+                    </td>
+                    <td>
+                        <a asp-controller="MonthlyActivities" asp-action="UpdateMonthlyActivities" asp-route-id="@item.Id" class="btn btn-success"><i class="bi bi-pencil-square"></i> Edit</a>
+                        <a asp-controller="MonthlyActivities" asp-action="DeleteMonthlyActivities" asp-route-id="@item.Id" class="btn btn-danger"><i class="bi bi-trash-fill"></i> Delete</a>
                     </td>
                 </tr>
             }

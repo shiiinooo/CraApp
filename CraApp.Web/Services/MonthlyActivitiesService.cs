@@ -74,7 +74,7 @@ namespace CraApp.Web.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.GET,
-                Url = apiBaseUrl + $"/api/activity/{UserId}/{Month}",
+                Url = apiBaseUrl + $"/users/{UserId}/activities/{Month}",
                 Token = token
             });
         }
