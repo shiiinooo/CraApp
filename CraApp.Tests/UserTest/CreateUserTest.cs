@@ -1,4 +1,6 @@
-﻿namespace CraApp.Tests.UserTest;
+﻿using CraApp.Tests.Util;
+
+namespace CraApp.Tests.UserTest;
 
 public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
 {
@@ -6,7 +8,7 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
     private readonly HttpClient _client;
     private User _newUser;
     private JsonSerializerOptions _options;
-
+    private readonly string url = "/users";
     public CreateUserTest(WebApplicationFactory<Program> factory)
     {
         _factory = factory;
@@ -30,28 +32,16 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task CreateUser_Endpoint_Returns_Correct_Response()
     {
         // Arrange
-        await ClearDatabaseAsync();
-        var token = await GetJwtToken();
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var content = JsonContent.Create(_newUser);
+    
+        var createdUser = await Helper.Post(_newUser, url, _client);
 
-        // Act
-        var response = await _client.PostAsync("/users", content);
-
-        // Assert
-        response.EnsureSuccessStatusCode(); // Status Code 200-299
-        var responseString = await response.Content.ReadAsStringAsync();
-       
-        // Deserialize APIResponse with options
-        var apiResponse = JsonSerializer.Deserialize<APIResponse>(responseString, _options);
-        Assert.NotNull(apiResponse);
-        Assert.True(apiResponse.IsSuccess);
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        Assert.Empty(apiResponse.ErrorsMessages ?? new List<string>());
+        Assert.NotNull(Helper._APIResponse);
+        Assert.True(Helper._APIResponse.IsSuccess);
+        Assert.Equal(HttpStatusCode.Created, Helper._APIResponse.StatusCode);
+        Assert.Empty(Helper._APIResponse.ErrorsMessages ?? new List<string>());
 
         // Deserialize the Result to UserDTO
-        var jsonElement = (JsonElement)apiResponse.Result;
-        var createdUser = JsonSerializer.Deserialize<UserDTO>(jsonElement.GetRawText(), _options);
+
 
         Assert.NotNull(createdUser);
         Assert.Equal(_newUser.UserName, createdUser.UserName);
@@ -59,7 +49,8 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
         Assert.Equal(_newUser.Role, createdUser.Role);
         Assert.True(createdUser.Id > 0, "User ID should be greater than 0.");
 
-        await ClearDatabaseAsync();
+
+        await Helper.CleanUsers(_client, createdUser.Id);
         _client.Dispose();
     }
 
@@ -67,8 +58,7 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task CreateUser_Endpoint_Returns_BadRequest_For_Invalid_Input()
     {
         // Arrange
-        var token = await GetJwtToken();
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+ 
         var invalidUser = new User
         {
             UserName = "", // Invalid input: empty UserName
@@ -76,19 +66,15 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
             Password = "Admin123",
             Role = "admin"
         };
-        var content = JsonContent.Create(invalidUser);
 
-        // Act
-        var response = await _client.PostAsync("/users", content);
+        var userDTO = await Helper.Post(invalidUser, url, _client);
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, Helper._APIResponse.StatusCode);
 
-        var apiResponse = await response.Content.ReadFromJsonAsync<APIResponse>();
-
-        Assert.NotNull(apiResponse);
-        Assert.False(apiResponse.IsSuccess);
-        Assert.NotEmpty(apiResponse.ErrorsMessages ?? new List<string>());
+        Assert.NotNull(Helper._APIResponse);
+        Assert.False(Helper._APIResponse.IsSuccess);
+        Assert.NotEmpty(Helper._APIResponse.ErrorsMessages ?? new List<string>());
         _client.Dispose();
     }
 
@@ -96,10 +82,7 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task CreateUser_Endpoint_Returns_Conflict_For_Duplicate_User()
     {
         // Arrange
-        await ClearDatabaseAsync();
-        var token = await GetJwtToken();
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        //var client = _factory.CreateClient();
+        
         var newUser = new User
         {
             UserName = "duplicateuser",
@@ -107,98 +90,56 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
             Password = "Admin123",
             Role = "admin"
         };
-        var content = JsonContent.Create(newUser);
+       
 
         // Act
         // First attempt to create the user
-        await _client.PostAsync("/users", content);
+        var createduser = await Helper.Post(newUser, "/users", _client);
 
         // Second attempt to create the same user
-        var response = await _client.PostAsync("/users", content);
+        var result = await Helper.Post(newUser, "/users", _client);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, Helper._APIResponse.StatusCode);
 
-        var apiResponse = await response.Content.ReadFromJsonAsync<APIResponse>();
+        
 
-        Assert.NotNull(apiResponse);
-        Assert.False(apiResponse.IsSuccess);
-        Assert.NotEmpty(apiResponse.ErrorsMessages ?? new List<string>());
+        Assert.NotNull(Helper._APIResponse);
+        Assert.False(Helper._APIResponse.IsSuccess);
+        Assert.NotEmpty(Helper._APIResponse.ErrorsMessages ?? new List<string>());
 
-        await ClearDatabaseAsync();
+        await Helper.CleanUsers(_client, createduser.Id);
         _client.Dispose();
     }
 
     [Fact]
     public async Task CreateUser_Endpoint_Returns_BadRequest_For_Missing_Required_Fields()
     {
-        // Arrange
-        var token = await GetJwtToken();
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        //var client = _factory.CreateClient();
+        
         var invalidUser = new User
         {
             UserName = "testuser", // Missing Name field
             Password = "Admin123",
             Role = "admin"
         };
-        var content = JsonContent.Create(invalidUser);
+      
 
         // Act
-        var response = await _client.PostAsync("/users", content);
+        var response = await Helper.Post(invalidUser, "/users",_client );
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, Helper._APIResponse.StatusCode);
 
-        var apiResponse = await response.Content.ReadFromJsonAsync<APIResponse>();
+       
 
-        Assert.NotNull(apiResponse);
-        Assert.False(apiResponse.IsSuccess);
-        Assert.NotEmpty(apiResponse.ErrorsMessages ?? new List<string>());
+        Assert.NotNull(Helper._APIResponse);
+        Assert.False(Helper._APIResponse.IsSuccess);
+        Assert.NotEmpty(Helper._APIResponse.ErrorsMessages ?? new List<string>());
     }
 
-    public void Dispose()
-    {
-        _client.Dispose();
-        _factory.Dispose();
-    }
+   
+   
 
-    private async Task ClearDatabaseAsync()
-    {
-        // Implement logic to clear or reset database state
-        using (var scope = _factory.Services.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            await dbContext.Database.EnsureDeletedAsync();
-            await dbContext.Database.EnsureCreatedAsync();
-        }
-    }
-
-    private async Task<string> GetJwtToken()
-    {
-        var loginRequest = new
-        {
-            UserName = "shiinoo",
-            Password = "Password123#"
-        };
-
-        var response = await _client.PostAsJsonAsync("/login", loginRequest);
-        response.EnsureSuccessStatusCode();
-
-        var responseString = await response.Content.ReadAsStringAsync();
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-        var apiResponse = JsonSerializer.Deserialize<APIResponse>(responseString, options);
-
-        if (apiResponse?.Result != null)
-        {
-            var loginResponse = JsonSerializer.Deserialize<LoginResponseDTO>(apiResponse.Result.ToString(), options);
-            return loginResponse?.Token;
-        }
-
-        throw new InvalidOperationException("Failed to retrieve JWT token");
-    }
+   
 
 }

@@ -41,7 +41,7 @@ public class UpdateActivityTest
         var updatedActivity = JsonSerializer.Deserialize<ActivityDTO>(jsonElement.GetRawText(), options);
 
         Assert.True(_APIResponse.IsSuccess);
-        Assert.Equal(HttpStatusCode.NoContent, _APIResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, _APIResponse.StatusCode);
 
         Assert.Equal(ActivityDTO.StartTime, updatedActivity.StartTime);
         Assert.Equal(ActivityDTO.EndTime, updatedActivity.EndTime);
@@ -49,7 +49,7 @@ public class UpdateActivityTest
         Assert.Equal(ActivityDTO.Project, updatedActivity.Project);
         Assert.Equal(ActivityDTO.MonthlyActivitiesId, updatedActivity.MonthlyActivitiesId);
 
-
+        await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
     }
 
 }

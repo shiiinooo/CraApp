@@ -10,7 +10,12 @@ public class GetMonthlyActivities : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/monthlyActivities", GetMonthlyActivitiesHandler);
+        app.MapGet("/api/monthlyActivities", GetMonthlyActivitiesHandler)
+             .WithName("GetMonthlyActivities")
+            .Produces<APIResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .WithSummary("Retrieving Monthly Activites")
+            .WithTags("MonthlyActivities");
     }
 
     private async Task<IResult> GetMonthlyActivitiesHandler(ISender sender)

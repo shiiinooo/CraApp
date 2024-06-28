@@ -9,7 +9,12 @@ public class UpdateMonthlyActivities : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/api/activities", UpdateMonthlyActivitiesHandler);
+        app.MapPut("/api/activities", UpdateMonthlyActivitiesHandler)
+             .WithName("UpdateMonthlyActivities")
+            .Produces<APIResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .WithSummary("Update Monthly Activities")
+            .WithTags("MonthlyActivities");
     }
 
     private async Task<IResult> UpdateMonthlyActivitiesHandler(ISender sender, MonthlyActivitiesDTO monthlyActivitiesDTO)

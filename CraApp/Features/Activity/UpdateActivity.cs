@@ -10,7 +10,12 @@ public class UpdateActivity : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPut("/api/activity", UpdateActivityHandler)
-            .WithName("UpdateActivity");
+            .WithName("UpdateActivity")
+            .Produces<APIResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .WithSummary("Update Activity ")
+            .WithTags("Activity")
+            ;
     }
 
     private async Task<IResult> UpdateActivityHandler(ISender sender, [FromBody] ActivityDTO activityDTO )
@@ -22,7 +27,7 @@ public class UpdateActivity : ICarterModule
             var result = await sender.Send(command);
             APIResponse.IsSuccess = true;
             APIResponse.Result = result;
-            APIResponse.StatusCode = HttpStatusCode.NoContent;
+            APIResponse.StatusCode = HttpStatusCode.OK;
             return Results.Created($"api/activity/", APIResponse);
 
         }

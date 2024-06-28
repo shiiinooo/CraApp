@@ -1,5 +1,8 @@
 ﻿
 
+using CraApp.Model;
+using Microsoft.EntityFrameworkCore;
+
 namespace CraApp.Repository;
 
 public class MonthlyActivitiesRepository : Repository<MonthlyActivities>, IMonthlyActivitiesRepository
@@ -20,4 +23,12 @@ public class MonthlyActivitiesRepository : Repository<MonthlyActivities>, IMonth
     {
         return await _db.MonthlyActivities.FirstOrDefaultAsync(u => u.Id == monthlyActivitiesId);
     }
+
+    public async Task<bool> IsMonthlyActivitiesExisit(int userId, int  year, int month)
+    {
+        return await _db.MonthlyActivities
+            .AnyAsync(ma => ma.UserId == userId && ma.Year == year && ma.Month == month);
+    }
+
+   
 }

@@ -49,17 +49,17 @@ public class CreateMonthlyActivitiesTest
     public async void Should_Save_Monthly_Activities()
     {
 
-        
-        var _createdMonthlyActivities = await Helper.Post(_monthlyActivitiesDTO, url,_client);
+
+        var monthlyActivitiesDTO = await Helper.PopulateDataBase(_client);
        
 
-        Assert.Equal(HttpStatusCode.NoContent, Helper._APIResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, Helper._APIResponse.StatusCode);
         Assert.NotNull(Helper._APIResponse.Result);
         Assert.True(Helper._APIResponse.IsSuccess);
 
-        Assert.Equal(_createdMonthlyActivities.Year, _monthlyActivitiesDTO.Year);
-        Assert.Equal(_createdMonthlyActivities.Month, _monthlyActivitiesDTO.Month);
-
+        Assert.Equal(2023, monthlyActivitiesDTO.Year);
+        Assert.Equal(12, monthlyActivitiesDTO.Month);
+        Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
 
     }
     [Fact]
@@ -78,6 +78,6 @@ public class CreateMonthlyActivitiesTest
         Assert.True(!Helper._APIResponse.IsSuccess);
         Assert.Null(Helper._APIResponse.Result);
         Assert.NotNull(Helper._APIResponse.ErrorsMessages);
-        Assert.Equal("Day cannot exceded month max number of days or be less than zero. ", Helper._APIResponse.ErrorsMessages.First());
+        Assert.Equal("Day cannot exceed the month's max number of days or be less than zero.", Helper._APIResponse.ErrorsMessages.First());
     }
 }

@@ -12,7 +12,12 @@ public class DeleteActivity : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/api/activity/{Id:int}", DeleteActivityHandler);
+        app.MapDelete("/api/activity/{Id:int}", DeleteActivityHandler)
+            .WithName("DeleteActivity")
+            .Produces<APIResponse>(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithSummary("Deleting Activity")
+            .WithTags("Activity"); 
     }
 
     private async Task<IResult> DeleteActivityHandler(ISender sender, int id)

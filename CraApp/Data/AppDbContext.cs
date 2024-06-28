@@ -48,6 +48,55 @@ public class AppDbContext : DbContext
                 Password = "Password123#",
                 Role = "admin"
             });
+        modelBuilder.Entity<MonthlyActivities>().HasData(
+
+            new MonthlyActivities()
+            {
+                Id = 1,
+                Year = 2024,
+                Month = 01,
+                UserId = 1
+            },
+             new MonthlyActivities()
+             {
+                 Id= 2,
+                 Year = 2024,
+                 Month = 02,
+                 UserId = 1
+             }
+
+            );
+        modelBuilder.Entity<Activity>().HasData(
+
+            new Activity
+            {
+                Id = 1,
+                StartTime = new TimeSpan(10, 00, 00),
+                EndTime = new TimeSpan(16, 00, 00),
+                Day = 1,
+                Project = Project.Formation,
+                MonthlyActivitiesId = 1
+            },
+             new Activity
+             {
+                 Id = 21,
+                 StartTime = new TimeSpan(10, 00, 00),
+                 EndTime = new TimeSpan(16, 00, 00),
+                 Day = 2,
+                 Project = Project.MyTaraji,
+                 MonthlyActivitiesId = 1
+             },
+              new Activity
+              {
+                  Id = 3,
+                  StartTime = new TimeSpan(10, 00, 00),
+                  EndTime = new TimeSpan(16, 00, 00),
+                  Day = 3,
+                  Project = Project.Formation,
+                  MonthlyActivitiesId = 2
+              }
+
+            );
     }
 
 }

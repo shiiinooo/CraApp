@@ -14,7 +14,8 @@ public class CreateActivity() : ICarterModule
            .WithName("CreateActivity")
            .Produces<APIResponse>(StatusCodes.Status201Created)
            .ProducesProblem(StatusCodes.Status400BadRequest)
-           .WithSummary("Creating Activity");
+           .WithSummary("Creating Activity")
+           .WithTags("Activity");
     }
 
     

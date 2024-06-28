@@ -31,6 +31,7 @@ public class DeleteMonthlyActitivities
         _APIResponse = JsonSerializer.Deserialize<APIResponse>(result, options);
         Assert.Equal(HttpStatusCode.NoContent, _APIResponse.StatusCode);
         Assert.True(_APIResponse.IsSuccess);
+        Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
     }
 
     [Fact]
