@@ -35,19 +35,24 @@ public static class Helper
 
 
     }
+
+    public static async Task CleanMonthlyActivities(HttpClient _client, int Id)
+    {
+        var token = await GetJwtToken(_client);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var response = await _client.DeleteAsync($"/api/monthlyActivities/{Id}");
+    }
+
+    public static async Task CleanUsers(HttpClient _client, int Id)
+    {
+        var token = await GetJwtToken(_client);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        await _client.DeleteAsync($"/users/{Id}");
+
+    }
+
     public static async Task<MonthlyActivitiesDTO> PopulateDataBase(HttpClient _client)
     {
-        UserDTO userDTO = new UserDTO
-        {
-            UserName = "Maaaarouaaaane",
-            Name = "Marouane",
-            Role = "Admin",
-            Password = "Password"
-        };
-     
-        
-        UserDTO userdto  = await Helper.Post(userDTO, "/users", _client);
-        
         ActivityDTO _activity = new ActivityDTO
         {
             Project = Project.MyTaraji.ToString(),
@@ -57,9 +62,9 @@ public static class Helper
 
         };
 
-        MonthlyActivitiesDTO monthlyActivities = new MonthlyActivitiesDTO { Year = 2024, Month = 06,
+        MonthlyActivitiesDTO monthlyActivities = new MonthlyActivitiesDTO { Year = 2023, Month = 12,
             Activities = new List<ActivityDTO> { _activity } ,
-            UserId = userdto.Id};
+            UserId =1};
         
       
 

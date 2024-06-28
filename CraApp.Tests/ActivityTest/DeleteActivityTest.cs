@@ -38,6 +38,7 @@ public class DeleteActivityTest
         _APIResponse = JsonSerializer.Deserialize<APIResponse>(result,options);
         Assert.Equal(HttpStatusCode.NoContent, _APIResponse.StatusCode);
         Assert.True(_APIResponse.IsSuccess);
+        await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
     }
 
     [Fact]

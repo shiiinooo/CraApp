@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CraApp.Migrations
 {
     /// <inheritdoc />
-    public partial class reloadDB : Migration
+    public partial class PopulateDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -80,6 +80,25 @@ namespace CraApp.Migrations
                 {
                     { 1, "Ahmed", "Password123#", "admin", "shiinoo" },
                     { 2, "Marouane", "Password123#", "admin", "PipInstallGeek" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "MonthlyActivities",
+                columns: new[] { "Id", "Month", "UserId", "Year" },
+                values: new object[,]
+                {
+                    { 1, 1, 1, 2024 },
+                    { 2, 2, 1, 2024 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Activities",
+                columns: new[] { "Id", "Day", "EndTime", "MonthlyActivitiesId", "Project", "StartTime" },
+                values: new object[,]
+                {
+                    { 1, 1, new TimeSpan(0, 16, 0, 0, 0), 1, 0, new TimeSpan(0, 10, 0, 0, 0) },
+                    { 3, 3, new TimeSpan(0, 16, 0, 0, 0), 2, 0, new TimeSpan(0, 10, 0, 0, 0) },
+                    { 21, 2, new TimeSpan(0, 16, 0, 0, 0), 1, 1, new TimeSpan(0, 10, 0, 0, 0) }
                 });
 
             migrationBuilder.CreateIndex(

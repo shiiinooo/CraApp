@@ -1,4 +1,6 @@
-﻿namespace CraApp.Tests.UserTest;
+﻿using CraApp.Tests.Util;
+
+namespace CraApp.Tests.UserTest;
 
 public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
 {
@@ -29,16 +31,10 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task UpdateUser_Endpoint_Returns_Correct_Response()
     {
         // Arrange
-        await ClearDatabaseAsync();
-        var token = await GetJwtToken();
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        
+        var createdUser = await Helper.Post(_newUser, "/users", _client);
       
-        var createUserContent = JsonContent.Create(_newUser);
-        var createResponse = await _client.PostAsync("/users", createUserContent);
-        createResponse.EnsureSuccessStatusCode();
-        var createResponseString = await createResponse.Content.ReadAsStringAsync();
-        var createApiResponse = JsonSerializer.Deserialize<APIResponse>(createResponseString, _options);
-        var createdUser = JsonSerializer.Deserialize<UserDTO>(createApiResponse.Result.ToString(), _options);
 
         // Update user data
         var updatedUser = new UserDTO
@@ -66,7 +62,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
         Assert.Equal(updatedUser.UserName, updatedUserResponse.UserName);
         Assert.Equal(updatedUser.Name, updatedUserResponse.Name);
 
-        await ClearDatabaseAsync();
+        await Helper.CleanUsers(_client, createdUser.Id);
         _client.Dispose();
     }
 
@@ -74,8 +70,8 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task UpdateUser_Endpoint_Returns_NotFound_For_Nonexistent_User()
     {
         // Arrange
-        await ClearDatabaseAsync();
-        var token = await GetJwtToken();
+
+        var token = await Helper.GetJwtToken(_client);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var nonExistentUserId = 999; // Assuming this ID does not exist
 
@@ -94,7 +90,6 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
 
-        await ClearDatabaseAsync();
         _client.Dispose();
     }
 
@@ -102,17 +97,8 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task UpdateUser_Endpoint_Returns_BadRequest_For_Invalid_Input()
     {
         // Arrange
-        await ClearDatabaseAsync();
-        var token = await GetJwtToken();
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-        var createUserContent = JsonContent.Create(_newUser);
-        var createResponse = await _client.PostAsync("/users", createUserContent);
-        createResponse.EnsureSuccessStatusCode();
-        var createResponseString = await createResponse.Content.ReadAsStringAsync();
-        var createApiResponse = JsonSerializer.Deserialize<APIResponse>(createResponseString, _options);
-        var createdUser = JsonSerializer.Deserialize<UserDTO>(createApiResponse.Result.ToString(), _options);
-
+        var createdUser = await Helper.Post(_newUser, "/users", _client);
+       
         // Attempt to update with invalid data (empty UserName)
         var invalidUpdateUser = new UserDTO
         {
@@ -128,54 +114,8 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-        await ClearDatabaseAsync();
+        await Helper.CleanUsers(_client, createdUser.Id);
         _client.Dispose();
     }
-
-    public void Dispose()
-    {
-        _client.Dispose();
-        _factory.Dispose();
-    }
-
-    private async Task ClearDatabaseAsync()
-    {
-        // Implement logic to clear or reset database state
-        using (var scope = _factory.Services.CreateScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            await dbContext.Database.EnsureDeletedAsync();
-            await dbContext.Database.EnsureCreatedAsync();
-        }
-    }
-
-    private async Task<string> GetJwtToken()
-    {
-        var loginRequest = new
-        {
-            UserName = "shiinoo",
-            Password = "Password123#"
-        };
-
-        var response = await _client.PostAsJsonAsync("/login", loginRequest);
-        response.EnsureSuccessStatusCode();
-
-        var responseString = await response.Content.ReadAsStringAsync();
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-        var apiResponse = JsonSerializer.Deserialize<APIResponse>(responseString, options);
-
-        if (apiResponse?.Result != null)
-        {
-            var loginResponse = JsonSerializer.Deserialize<LoginResponseDTO>(apiResponse.Result.ToString(), options);
-            return loginResponse?.Token;
-        }
-
-        throw new InvalidOperationException("Failed to retrieve JWT token");
-    }
-
 
 }

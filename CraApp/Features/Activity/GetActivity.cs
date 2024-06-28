@@ -17,7 +17,8 @@ public class GetActivity : ICarterModule
             .WithName("GetActivity")
             .Produces<APIResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .WithSummary("Retrieving All Activities");
+            .WithSummary("Retrieving All Activities")
+            .WithTags("Activity");
     }
 
     private async Task<IResult> GetActivityHandler(ISender sender)

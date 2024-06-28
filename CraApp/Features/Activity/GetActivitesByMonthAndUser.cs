@@ -82,6 +82,7 @@ public class ActivitiesByMonthAndUserEndpoint : ICarterModule
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithName("GetActivitiesByMonthAndUser")
         .WithSummary("Get Activities By Month And User")
-        .WithDescription("Retrieve activities for a specific month of a user.");
+        .WithDescription("Retrieve activities for a specific month of a user.")
+        .WithTags("Activity"); 
     }
 }

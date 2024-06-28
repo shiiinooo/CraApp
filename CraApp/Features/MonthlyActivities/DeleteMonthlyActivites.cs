@@ -9,7 +9,12 @@ public class DeleteMonthlyActivites : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/api/monthlyActivities/{Id:int}", DeleteMonthlyActivitesHandler);
+        app.MapDelete("/api/monthlyActivities/{Id:int}", DeleteMonthlyActivitesHandler)
+            .WithName("DeleteMonthlyActivities")
+            .Produces<APIResponse>(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithSummary("Deleting Monthly Activities")
+            .WithTags("MonthlyActivities");
     }
 
     private async Task<IResult> DeleteMonthlyActivitesHandler(ISender sender, int Id)

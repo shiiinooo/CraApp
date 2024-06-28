@@ -50,6 +50,35 @@ namespace CraApp.Migrations
                     b.HasIndex("MonthlyActivitiesId");
 
                     b.ToTable("Activities");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Day = 1,
+                            EndTime = new TimeSpan(0, 16, 0, 0, 0),
+                            MonthlyActivitiesId = 1,
+                            Project = 0,
+                            StartTime = new TimeSpan(0, 10, 0, 0, 0)
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Day = 2,
+                            EndTime = new TimeSpan(0, 16, 0, 0, 0),
+                            MonthlyActivitiesId = 1,
+                            Project = 1,
+                            StartTime = new TimeSpan(0, 10, 0, 0, 0)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Day = 3,
+                            EndTime = new TimeSpan(0, 16, 0, 0, 0),
+                            MonthlyActivitiesId = 2,
+                            Project = 0,
+                            StartTime = new TimeSpan(0, 10, 0, 0, 0)
+                        });
                 });
 
             modelBuilder.Entity("CraApp.Model.MonthlyActivities", b =>
@@ -74,6 +103,22 @@ namespace CraApp.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("MonthlyActivities");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Month = 1,
+                            UserId = 1,
+                            Year = 2024
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Month = 2,
+                            UserId = 1,
+                            Year = 2024
+                        });
                 });
 
             modelBuilder.Entity("CraApp.Model.User", b =>
