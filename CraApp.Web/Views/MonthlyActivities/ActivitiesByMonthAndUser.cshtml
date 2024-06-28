@@ -1,36 +1,57 @@
-﻿@model IEnumerable<CraApp.Web.Models.Dto.ActivityDTO>
+﻿@model List<CraApp.Web.Models.Dto.ActivityDTO>
 
-<div class="container p-4 border">
-    <h1 class="text-primary">Monthly Activities</h1>
+<div class="container">
+    <h1 class="text-primary">Activities</h1>
+    <hr />
 
-    @if (Model == null || !Model.Any())
+    @if (TempData["error"] != null)
     {
-        <p>No activities found for this user and month.</p>
+        <div class="alert alert-danger">
+            @TempData["error"]
+        </div>
     }
-    else
-    {
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Day</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Project</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var activity in Model)
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Project</th>
+                <th></th> <!-- Extra column for action buttons -->
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var activity in Model)
                 {
                     <tr>
                         <td>@activity.Day</td>
                         <td>@activity.StartTime</td>
                         <td>@activity.EndTime</td>
                         <td>@activity.Project</td>
+                        <td>
+                            <!-- Action buttons for each activity (e.g., Edit, Delete) can go here -->
+                        </td>
                     </tr>
                 }
-            </tbody>
-        </table>
-    }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center">No activities found for this month.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-    <a asp-controller="User" asp-action="IndexUser" class="btn btn-primary">Back to User List</a>
+    <div class="mt-3">
+        <a asp-action="IndexMonthlyActivities"  class=" btn btn-primary">Back to List</a>
+        <a asp-action="CreateActivities" asp-controller="Activities" class="btn btn-success">Create Activity</a>
+    </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
