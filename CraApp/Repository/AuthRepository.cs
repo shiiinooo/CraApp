@@ -31,7 +31,8 @@ public class AuthRepository : IAuthRepository
 
     public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
     {
-        var user = _db.Users.SingleOrDefault(user => user.UserName == loginRequestDTO.UserName && user.Password == loginRequestDTO.Password);
+        var user = await _db.Users.SingleOrDefaultAsync(user => user.UserName == loginRequestDTO.UserName && user.Password == loginRequestDTO.Password);
+        Console.WriteLine(user);
         if (user == null)
         {
             return null;
@@ -43,7 +44,7 @@ public class AuthRepository : IAuthRepository
             Subject = new ClaimsIdentity(new Claim[]
             {
             new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.Role, user.Role),
+            new Claim(ClaimTypes.Role, user.Role.ToString()),
             }),
             Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
@@ -64,9 +65,9 @@ public class AuthRepository : IAuthRepository
         User userObj = _mapper.Map<User>(registrationRequestDTO);
 
         // Use the role from the request DTO, or set a default if necessary
-        if (string.IsNullOrEmpty(userObj.Role))
+        if (string.IsNullOrEmpty(userObj.Role.ToString()))
         {
-            userObj.Role = "user"; // Set default role if none provided
+            userObj.Role = Role.user; // Set default role if none provided
         }
 
         _db.Users.Add(userObj);

@@ -23,7 +23,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
             UserName = "userToUpdate",
             Name = "name",
             Password = "Admin123@",
-            Role = "admin",
+            Role = Role.admin
         };
     }
 
@@ -42,7 +42,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
             Id = createdUser.Id,
             UserName = "updateduser",
             Name = "Updated User",
-            Role = "newRole",
+            Role = Role.user
         };
         var updateContent = JsonContent.Create(updatedUser);
 
@@ -80,7 +80,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
             Id = nonExistentUserId,
             UserName = "updateduser",
             Name = "Updated User",
-            Role = "newRole"
+            Role = Role.user,
         };
         var updateContent = JsonContent.Create(updateUser);
 
@@ -105,7 +105,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
             Id = createdUser.Id,
             UserName = "", // Invalid input
             Name = "Updated User",
-            Role = "admin",
+            Role = Role.admin,
         };
         var invalidUpdateContent = JsonContent.Create(invalidUpdateUser);
 

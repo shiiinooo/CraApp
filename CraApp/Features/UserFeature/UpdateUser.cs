@@ -34,12 +34,12 @@ internal class UpdateUserCommandHandler : ICommandHandler<UpdateUserCommand, Upd
         // Update the user details
         existingUser.UserName = command.UserName;
         existingUser.Name = command.Name;
-        existingUser.Role = command.Role;
+        existingUser.Role = (Role)Enum.Parse(typeof(Role), command.Role);
 
         await _repository.UpdateAsync(existingUser, cancellationToken);
         await _repository.SaveAsync();
 
-        return new UpdateUserResult(existingUser.Id, existingUser.UserName, existingUser.Name, existingUser.Role);
+        return new UpdateUserResult(existingUser.Id, existingUser.UserName, existingUser.Name, existingUser.Role.ToString());
     }
 }
 

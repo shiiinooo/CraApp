@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CraApp.Migrations
 {
     /// <inheritdoc />
-    public partial class PopulateDB : Migration
+    public partial class reloadDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,7 +22,7 @@ namespace CraApp.Migrations
                     UserName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Role = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Role = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -78,8 +78,8 @@ namespace CraApp.Migrations
                 columns: new[] { "Id", "Name", "Password", "Role", "UserName" },
                 values: new object[,]
                 {
-                    { 1, "Ahmed", "Password123#", "admin", "shiinoo" },
-                    { 2, "Marouane", "Password123#", "admin", "PipInstallGeek" }
+                    { 1, "Ahmed", "Password123#", 0, "shiinoo" },
+                    { 2, "Marouane", "Password123#", 0, "PipInstallGeek" }
                 });
 
             migrationBuilder.InsertData(

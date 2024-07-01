@@ -24,7 +24,7 @@ public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
             UserName = "userToDelete",
             Name = "name",
             Password = "Admin123@",
-            Role = "admin",
+            Role = Role.admin,
         };
       
         var createdUser = await Helper.Post(newUser, "/users", _client);
