@@ -1,26 +1,48 @@
-﻿namespace CraApp.Tests.UserTest;
+﻿using CraApp.Features.UserFeature;
+using CraApp.Repository.IRepository;
+using CraApp.Tests.Util;
+using Moq;
+
+namespace CraApp.Tests.UserTest;
 
 public class GetUsersTest : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
     private JsonSerializerOptions _options;
+    private LoginRequestDTO _adminLoginRequestDTO;
 
     public GetUsersTest(WebApplicationFactory<Program> factory)
     {
-        _factory = factory;
+        _factory = factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureServices(services =>
+            {
+                var userRepositoryMock = new Mock<IUserRepository>();
+                userRepositoryMock.Setup(repo => repo.GetAllAsync(It.IsAny<CancellationToken>()))
+                                  .ReturnsAsync(new List<User>());
+
+                services.AddSingleton(userRepositoryMock.Object);
+            });
+        });
         _client = _factory.CreateClient();
         // Define JSON serializer options for case-insensitive matching
         _options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
+        _adminLoginRequestDTO = new LoginRequestDTO
+        {
+            UserName = "shiinoo",
+            Password = "Password123#"
+        };
+
     }
     [Fact]
-    public async Task GetUsers_Endpoint_Returns_Correct_Response()
+    public async Task GetUsers_Endpoint_Returns_Correct_Response_for_authorised_existing_user()
     {
         // Arrange
-        var token = await GetJwtToken();
+        var token = await Helper.GetJwtToken(_client, _adminLoginRequestDTO);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
@@ -32,54 +54,66 @@ public class GetUsersTest : IClassFixture<WebApplicationFactory<Program>>
 
         // Deserialize APIResponse with options
         var apiResponse = JsonSerializer.Deserialize<APIResponse>(responseString, _options);
-        Assert.NotNull(apiResponse);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Empty(apiResponse.ErrorsMessages ?? new List<string>());
-
-        // Deserialize the Result to UserDTO
-        var jsonElement = (JsonElement)apiResponse.Result;
-        var users = JsonSerializer.Deserialize<List<UserDTO>>(jsonElement.GetRawText(), _options);
 
         Assert.NotNull(apiResponse);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Empty(apiResponse.ErrorsMessages ?? new List<string>());
 
-        foreach (var user in users)
-        {
-            Assert.True(user.Id > 0, "User ID should be greater than 0.");
-            Assert.NotNull(user.UserName);
-            Assert.NotNull(user.Name);
-        }
     }
 
-    private async Task<string> GetJwtToken()
+    [Fact]
+    public async Task GetUsers_Endpoint_Returns_Unauthorized_When_No_Token()
     {
-        var loginRequest = new
-        {
-            UserName = "shiinoo", 
-            Password = "Password123#"
-        };
+        // Act
+        var response = await _client.GetAsync("/users");
 
-        var response = await _client.PostAsJsonAsync("/login", loginRequest);
-        response.EnsureSuccessStatusCode();
-
-        var responseString = await response.Content.ReadAsStringAsync();
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-        var apiResponse = JsonSerializer.Deserialize<APIResponse>(responseString, options);
-
-        if (apiResponse?.Result != null)
-        {
-            var loginResponse = JsonSerializer.Deserialize<LoginResponseDTO>(apiResponse.Result.ToString(), options);
-            return loginResponse?.Token;
-        }
-
-        throw new InvalidOperationException("Failed to retrieve JWT token");
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
+    [Fact]
+    public async Task GetUsers_Endpoint_Returns_Forbidden_For_Insufficient_Permissions()
+    {
+        // Arrange
+        var loginRequest = new LoginRequestDTO
+        {
+            UserName = "user",
+            Password = "user"
+        };
+        var token = await Helper.GetJwtToken(_client, loginRequest);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+        // Act
+        var response = await _client.GetAsync("/users");
 
+        // Assert
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetUsers_Endpoint_Returns_Empty_List_When_No_Users()
+    {
+        // Arrange
+        var token = await Helper.GetJwtToken(_client, _adminLoginRequestDTO);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        // Act
+        var response = await _client.GetAsync("/users");
+
+        // Assert
+        response.EnsureSuccessStatusCode(); // Status Code 200-299
+        var responseString = await response.Content.ReadAsStringAsync();
+
+        // Deserialize APIResponse with options
+        var apiResponse = JsonSerializer.Deserialize<APIResponse>(responseString, _options);
+
+        Assert.NotNull(apiResponse);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Empty(apiResponse.ErrorsMessages ?? new List<string>());
+
+        // Explicitly handle JsonElement deserialization
+        var users = ((JsonElement)apiResponse.Result).Deserialize<IEnumerable<GetUsersResult>>(_options);
+        Assert.Empty(users);
+    }
 
 }

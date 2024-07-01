@@ -25,7 +25,7 @@ internal class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, GetUser
             return null;
         }
 
-        return new GetUserByIdResult(user.Id, user.UserName, user.Name, user.Role);
+        return new GetUserByIdResult(user.Id, user.UserName, user.Name, user.Role.ToString());
     }
 }
 

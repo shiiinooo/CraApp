@@ -1,4 +1,6 @@
+using CraApp.Behavior;
 using CraApp.Features.Auth;
+using CraApp.Features.UserFeature;
 using CraApp.Repository;
 using MapsterMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -8,6 +10,7 @@ using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+var assembly = typeof(Program).Assembly;
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -49,17 +52,24 @@ builder.Services.AddScoped<IActivityRepository, ActivityRepository>();
 builder.Services.AddScoped<IMonthlyActivitiesRepository, MonthlyActivitiesRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
+// ------------ Validation --------------
+builder.Services.AddValidatorsFromAssembly(assembly);
+
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+
 // ------------ Cater--------------
 
 builder.Services.AddCarter();
 
 // ------------ MediatR --------------
 
-var assembly = typeof(Program).Assembly;
+
 
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssembly(assembly);
+    config.AddOpenBehavior(typeof(ValidationBehavior<,>));
 });
 
 // ------------ Register Mapster --------------

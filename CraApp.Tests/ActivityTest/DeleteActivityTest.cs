@@ -13,15 +13,19 @@ public class DeleteActivityTest
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
     private APIResponse _APIResponse;
+    private LoginRequestDTO _adminLoginRequestDTO;
 
     public DeleteActivityTest()
     {
         _factory = new WebApplicationFactory<Program>();
         _client = _factory.CreateClient();
         _APIResponse = new APIResponse();
+        _adminLoginRequestDTO = new LoginRequestDTO
+        {
+            UserName = "shiinoo",
+            Password = "Password123#"
+        };
     }
-
-
 
     [Fact]
     public async void Should_Delete_Activity()
@@ -36,7 +40,7 @@ public class DeleteActivityTest
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         _APIResponse = JsonSerializer.Deserialize<APIResponse>(result,options);
-        await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
+        await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id, _adminLoginRequestDTO);
     }
 
     [Fact]

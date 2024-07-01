@@ -9,13 +9,18 @@ public class UpdateActivityTest
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
     private APIResponse _APIResponse;
-
+    private LoginRequestDTO _adminLoginRequestDTO;
 
     public UpdateActivityTest()
     {
         _factory = new WebApplicationFactory<Program>();
         _client = _factory.CreateClient();
         _APIResponse = new APIResponse();
+        _adminLoginRequestDTO = new LoginRequestDTO
+        {
+            UserName = "shiinoo",
+            Password = "Password123#"
+        };
     }
 
     [Fact]
@@ -50,7 +55,7 @@ public class UpdateActivityTest
         Assert.Equal(ActivityDTO.Project, updatedActivity.Project);
         Assert.Equal(ActivityDTO.MonthlyActivitiesId, updatedActivity.MonthlyActivitiesId);
 
-        await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
+        await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id, _adminLoginRequestDTO);
     }
 
 }

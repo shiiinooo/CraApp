@@ -12,11 +12,17 @@ public class CreateMonthlyActivitiesTest
     private readonly HttpClient _client;
     private MonthlyActivitiesDTO _monthlyActivitiesDTO;
     private readonly string url = "/api/monthlyActivities";
+    private LoginRequestDTO _adminLoginRequestDTO;
 
     public CreateMonthlyActivitiesTest()
     {
         _factory = new WebApplicationFactory<Program>();
         _client = _factory.CreateClient();
+        _adminLoginRequestDTO = new LoginRequestDTO
+        {
+            UserName = "shiinoo",
+            Password = "Password123#"
+        };
         _monthlyActivitiesDTO = new MonthlyActivitiesDTO
         {
             Year = 2024,
@@ -56,7 +62,7 @@ public class CreateMonthlyActivitiesTest
         Assert.NotNull(Helper._APIResponse.Result);
         Assert.Equal(2023, monthlyActivitiesDTO.Year);
         Assert.Equal(12, monthlyActivitiesDTO.Month);
-        Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
+        Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id, _adminLoginRequestDTO);
 
     }
     [Fact]
@@ -70,7 +76,7 @@ public class CreateMonthlyActivitiesTest
             MonthlyActivitiesId = 1, 
         });
 
-        var _createdMonthlyActivities = await Helper.Post(_monthlyActivitiesDTO, url, _client);
+        var _createdMonthlyActivities = await Helper.Post(_monthlyActivitiesDTO, url, _client, _adminLoginRequestDTO);
 
         Assert.Null(Helper._APIResponse.Result);
         Assert.NotNull(Helper._APIResponse.ErrorsMessages);

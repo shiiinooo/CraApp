@@ -7,7 +7,8 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
     private JsonSerializerOptions _options;
-    private User _newUser;
+    private UserDTO _newUser;
+    private LoginRequestDTO _adminLoginRequestDTO;
 
     public UpdateUserTest(WebApplicationFactory<Program> factory)
     {
@@ -18,12 +19,18 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
         {
             PropertyNameCaseInsensitive = true
         };
-        _newUser = new User
+        _newUser = new UserDTO
         {
             UserName = "userToUpdate",
             Name = "name",
             Password = "Admin123@",
-            Role = "admin",
+            Role = Role.admin.ToString()
+        };
+
+        _adminLoginRequestDTO = new LoginRequestDTO
+        {
+            UserName = "shiinoo",
+            Password = "Password123#"
         };
     }
 
@@ -31,18 +38,14 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task UpdateUser_Endpoint_Returns_Correct_Response()
     {
         // Arrange
-
-        
-        var createdUser = await Helper.Post(_newUser, "/users", _client);
-      
-
+        var createdUser = await Helper.Post(_newUser, "/users", _client, _adminLoginRequestDTO);
         // Update user data
         var updatedUser = new UserDTO
         {
             Id = createdUser.Id,
             UserName = "updateduser",
             Name = "Updated User",
-            Role = "newRole",
+            Role = Role.user.ToString()
         };
         var updateContent = JsonContent.Create(updatedUser);
 
@@ -61,25 +64,24 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
         Assert.Equal(updatedUser.UserName, updatedUserResponse.UserName);
         Assert.Equal(updatedUser.Name, updatedUserResponse.Name);
 
-        await Helper.CleanUsers(_client, createdUser.Id);
+        await Helper.CleanUsers(_client, createdUser.Id, _adminLoginRequestDTO);
         _client.Dispose();
     }
 
     [Fact]
     public async Task UpdateUser_Endpoint_Returns_NotFound_For_Nonexistent_User()
     {
-        // Arrange
-
-        var token = await Helper.GetJwtToken(_client);
+        // Arrange      
+        var token = await Helper.GetJwtToken(_client, _adminLoginRequestDTO);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var nonExistentUserId = 999; // Assuming this ID does not exist
 
-        var updateUser = new User
+        var updateUser = new UserDTO
         {
             Id = nonExistentUserId,
             UserName = "updateduser",
             Name = "Updated User",
-            Role = "newRole"
+            Role = Role.user.ToString(),
         };
         var updateContent = JsonContent.Create(updateUser);
 
@@ -96,7 +98,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task UpdateUser_Endpoint_Returns_BadRequest_For_Invalid_Input()
     {
         // Arrange
-        var createdUser = await Helper.Post(_newUser, "/users", _client);
+        var createdUser = await Helper.Post(_newUser, "/users", _client, _adminLoginRequestDTO);
        
         // Attempt to update with invalid data (empty UserName)
         var invalidUpdateUser = new UserDTO
@@ -104,7 +106,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
             Id = createdUser.Id,
             UserName = "", // Invalid input
             Name = "Updated User",
-            Role = "admin",
+            Role = Role.admin.ToString(),
         };
         var invalidUpdateContent = JsonContent.Create(invalidUpdateUser);
 
@@ -113,7 +115,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        await Helper.CleanUsers(_client, createdUser.Id);
+        await Helper.CleanUsers(_client, createdUser.Id, _adminLoginRequestDTO);
         _client.Dispose();
     }
 

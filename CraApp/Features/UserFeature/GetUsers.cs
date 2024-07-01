@@ -4,7 +4,7 @@
 public record GetUsersQuery() : IQuery<IEnumerable<GetUsersResult>>;
 
 //Result
-public record GetUsersResult(int Id, string UserName, string Name, string Role);
+public record GetUsersResult(int Id, string UserName, string Name, Role Role);
 
 // Handler
 internal class GetUsersQueryHandler : IQueryHandler<GetUsersQuery, IEnumerable<GetUsersResult>>

@@ -135,8 +135,8 @@ namespace CraApp.Migrations
                     b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Role")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
@@ -151,7 +151,7 @@ namespace CraApp.Migrations
                             Id = 1,
                             Name = "Ahmed",
                             Password = "Password123#",
-                            Role = "admin",
+                            Role = 0,
                             UserName = "shiinoo"
                         },
                         new
@@ -159,8 +159,16 @@ namespace CraApp.Migrations
                             Id = 2,
                             Name = "Marouane",
                             Password = "Password123#",
-                            Role = "admin",
+                            Role = 0,
                             UserName = "PipInstallGeek"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "user",
+                            Password = "user",
+                            Role = 1,
+                            UserName = "user"
                         });
                 });
 
