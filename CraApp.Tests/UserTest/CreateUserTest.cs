@@ -6,19 +6,19 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
-    private User _newUser;
+    private UserDTO _newUser;
     private JsonSerializerOptions _options;
     private readonly string url = "/users";
     public CreateUserTest(WebApplicationFactory<Program> factory)
     {
         _factory = factory;
         _client = _factory.CreateClient();
-        _newUser = new User
+        _newUser = new UserDTO
         {
             UserName = "name",
             Name = "name",
             Password = "Admin123@",
-            Role = Role.admin
+            Role = Role.admin.ToString(),
         };
 
         // Define JSON serializer options for case-insensitive matching
@@ -57,13 +57,13 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task CreateUser_Endpoint_Returns_BadRequest_For_Invalid_Input()
     {
         // Arrange
- 
-        var invalidUser = new User
+
+        var invalidUser = new UserDTO
         {
             UserName = "", // Invalid input: empty UserName
             Name = "Test User",
             Password = "Admin123",
-            Role = Role.admin
+            Role = Role.admin.ToString()
         };
 
         var userDTO = await Helper.Post(invalidUser, url, _client);
@@ -81,12 +81,12 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
     {
         // Arrange
         
-        var newUser = new User
+        var newUser = new UserDTO
         {
             UserName = "duplicateuser",
             Name = "Duplicate User",
             Password = "Admin123",
-            Role = Role.admin
+            Role = Role.admin.ToString()
         };
        
 
@@ -113,11 +113,11 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task CreateUser_Endpoint_Returns_BadRequest_For_Missing_Required_Fields()
     {
         
-        var invalidUser = new User
+        var invalidUser = new UserDTO
         {
             UserName = "testuser", // Missing Name field
             Password = "Admin123",
-            Role = Role.admin
+            Role = Role.admin.ToString()
         };  
       
 

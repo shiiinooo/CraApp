@@ -7,7 +7,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
     private JsonSerializerOptions _options;
-    private User _newUser;
+    private UserDTO _newUser;
 
     public UpdateUserTest(WebApplicationFactory<Program> factory)
     {
@@ -18,12 +18,12 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
         {
             PropertyNameCaseInsensitive = true
         };
-        _newUser = new User
+        _newUser = new UserDTO
         {
             UserName = "userToUpdate",
             Name = "name",
             Password = "Admin123@",
-            Role = Role.admin
+            Role = Role.admin.ToString()
         };
     }
 
@@ -42,7 +42,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
             Id = createdUser.Id,
             UserName = "updateduser",
             Name = "Updated User",
-            Role = Role.user
+            Role = Role.user.ToString()
         };
         var updateContent = JsonContent.Create(updatedUser);
 
@@ -74,12 +74,12 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var nonExistentUserId = 999; // Assuming this ID does not exist
 
-        var updateUser = new User
+        var updateUser = new UserDTO
         {
             Id = nonExistentUserId,
             UserName = "updateduser",
             Name = "Updated User",
-            Role = Role.user,
+            Role = Role.user.ToString(),
         };
         var updateContent = JsonContent.Create(updateUser);
 
@@ -104,7 +104,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
             Id = createdUser.Id,
             UserName = "", // Invalid input
             Name = "Updated User",
-            Role = Role.admin,
+            Role = Role.admin.ToString(),
         };
         var invalidUpdateContent = JsonContent.Create(invalidUpdateUser);
 

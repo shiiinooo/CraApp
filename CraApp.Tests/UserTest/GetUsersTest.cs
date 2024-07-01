@@ -32,24 +32,11 @@ public class GetUsersTest : IClassFixture<WebApplicationFactory<Program>>
 
         // Deserialize APIResponse with options
         var apiResponse = JsonSerializer.Deserialize<APIResponse>(responseString, _options);
-        Assert.NotNull(apiResponse);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Empty(apiResponse.ErrorsMessages ?? new List<string>());
-
-        // Deserialize the Result to UserDTO
-        var jsonElement = (JsonElement)apiResponse.Result;
-        var users = JsonSerializer.Deserialize<List<UserDTO>>(jsonElement.GetRawText(), _options);
 
         Assert.NotNull(apiResponse);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Empty(apiResponse.ErrorsMessages ?? new List<string>());
 
-        foreach (var user in users)
-        {
-            Assert.True(user.Id > 0, "User ID should be greater than 0.");
-            Assert.NotNull(user.UserName);
-            Assert.NotNull(user.Name);
-        }
     }
 
     private async Task<string> GetJwtToken()

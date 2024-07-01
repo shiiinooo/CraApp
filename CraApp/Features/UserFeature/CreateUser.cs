@@ -1,4 +1,5 @@
 ﻿using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace CraApp.Features.UserFeature;
 
@@ -12,10 +13,10 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
 {
     public CreateUserCommandValidator()
     {
-        RuleFor(x => x.UserName).NotEmpty().WithMessage("UserName is required");
-        RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
-        RuleFor(x => x.Password).NotEmpty().WithMessage("Password is required");
-        RuleFor(x => x.Role).NotEmpty().WithMessage("Role is required");
+        RuleFor(x => x.UserName).NotEmpty().NotNull().WithMessage("UserName is required");
+        RuleFor(x => x.Name).NotEmpty().NotNull().WithMessage("Name is required");
+        RuleFor(x => x.Password).NotEmpty().NotNull().WithMessage("Password is required");
+        RuleFor(x => x.Role).NotEmpty().NotNull().WithMessage("Role is required");
     }
 }
 
@@ -81,39 +82,30 @@ public class UsersPostEndpoint : ICarterModule
         try
         {
             var result = await sender.Send(command);
-
-                response.Result = result;
-                return Results.Created($"/users", response);
-            }
-            catch (ArgumentException ex)
-            {
-                response.ErrorsMessages = new List<string> { ex.Message };
-                return Results.BadRequest(response);
-            }
-            catch (InvalidOperationException ex)
-            {
-                response.ErrorsMessages = new List<string> { ex.Message };
-                return Results.Conflict(response);
-            }
-            catch (Exception ex)
-            {
-                response.ErrorsMessages = new List<string> { ex.Message };
-                return Results.Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.InternalServerError);
-            }
-        })
-        .RequireAuthorization("AdminOnly") // Apply the AdminOnly policy
-        .Produces<APIResponse>(StatusCodes.Status201Created)
-        .ProducesProblem(StatusCodes.Status400BadRequest)
-        .ProducesProblem(StatusCodes.Status401Unauthorized)
-        .ProducesProblem(StatusCodes.Status403Forbidden)
-        .ProducesProblem(StatusCodes.Status409Conflict)
-        .ProducesProblem(StatusCodes.Status500InternalServerError)
-        .WithName("CreateUser")
-        .WithSummary("Create User")
-        .WithDescription("Create a new user");
+            response.Result = result;
+            return Results.Created($"/users", response);
+        }
+        catch (ValidationException ex)
+        {
+            response.ErrorsMessages = ex.Errors.Select(e => e.ErrorMessage).ToList();
+            return Results.BadRequest(response);
+        }
+        catch (InvalidOperationException ex)
+        {
+            response.ErrorsMessages = new List<string> { ex.Message };
+            return Results.Conflict(response);
+        }
+        catch (Exception ex)
+        {
+            response.ErrorsMessages = new List<string> { ex.Message };
+            return Results.Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.InternalServerError);
+        }
     }
 
-  
+
+
+
+
 
 }
 

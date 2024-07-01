@@ -19,12 +19,12 @@ public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
 
 
         // First, create a user to ensure there is a user to delete
-        var newUser = new User
+        var newUser = new UserDTO
         {
             UserName = "userToDelete",
             Name = "name",
             Password = "Admin123@",
-            Role = Role.admin,
+            Role = Role.admin.ToString(),
         };
       
         var createdUser = await Helper.Post(newUser, "/users", _client);
