@@ -26,13 +26,9 @@ public class DeleteActivity : ICarterModule
         var result = await sender.Send(new DeleteActivityCommand(id));
         if (result.IsSuccess)
         {
-            APIResponse.IsSuccess = true;
-            APIResponse.StatusCode = HttpStatusCode.NoContent;
             return Results.Ok(APIResponse);
         }
-        APIResponse.IsSuccess = false;
         APIResponse.ErrorsMessages = new List<string> { "Key Not Found "};
-        APIResponse.StatusCode = HttpStatusCode.NotFound;
         return Results.NotFound(APIResponse);
 
     }

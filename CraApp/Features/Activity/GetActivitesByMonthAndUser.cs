@@ -61,8 +61,6 @@ public class ActivitiesByMonthAndUserEndpoint : ICarterModule
             {
                 var notFoundResponse = new APIResponse
                 {
-                    IsSuccess = false,
-                    StatusCode = HttpStatusCode.NotFound,
                     ErrorsMessages = new List<string> { "No activities found for this user and month." }
                 };
                 return Results.NotFound(notFoundResponse);
@@ -70,8 +68,6 @@ public class ActivitiesByMonthAndUserEndpoint : ICarterModule
 
             var successResponse = new APIResponse
             {
-                IsSuccess = true,
-                StatusCode = HttpStatusCode.OK,
                 Result = response
             };
             return Results.Ok(successResponse);

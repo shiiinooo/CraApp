@@ -18,47 +18,41 @@ public class CreateActivity() : ICarterModule
            .WithTags("Activity");
     }
 
-    
+
     public async Task<IResult> CreateActivityHandler(ISender sender, [FromBody] ActivityDTO activityDTO)
     {
-
         var command = activityDTO.Adapt<CreateActivityCommand>();
+        var validationResponse = await ActivityValidator(activityDTO);
 
-        APIResponse APIResponse = await ActivityValidator(activityDTO);
-        if (APIResponse.IsSuccess)
+        if (validationResponse.ErrorsMessages.Count == 0)
         {
             var result = await sender.Send(command);
-            APIResponse.IsSuccess = true;
-            APIResponse.Result = result;
-            APIResponse.StatusCode = HttpStatusCode.Created;
-            return Results.Created($"api/activity/", APIResponse);
-
+            var response = new APIResponse
+            {
+                Result = result
+            };
+            return Results.Created($"api/activity/", response);
         }
 
-        return Results.BadRequest(APIResponse);
+        return Results.BadRequest(validationResponse);
 
     }
+
     private static readonly int maxHours = 10;
     public static async Task<APIResponse> ActivityValidator(ActivityDTO activityDTO)
     {
-        APIResponse APIResponse = new APIResponse();
-        APIResponse.IsSuccess = true;
+        var response = new APIResponse();
 
         if (activityDTO.StartTime > activityDTO.EndTime)
         {
-            APIResponse.IsSuccess = false;
-            APIResponse.StatusCode = HttpStatusCode.BadRequest;
-            APIResponse.ErrorsMessages = new List<string> { "End Time must be greater than Start Time" };
-            return APIResponse;
+            response.ErrorsMessages.Add("End Time must be greater than Start Time");
         }
         if ((activityDTO.EndTime - activityDTO.StartTime).TotalHours > maxHours)
         {
-            APIResponse.IsSuccess = false;
-            APIResponse.StatusCode = HttpStatusCode.BadRequest;
-            APIResponse.ErrorsMessages = new List<string> { "Illegal hours of work " };
-            return APIResponse;
+            response.ErrorsMessages.Add("Illegal hours of work");
         }
-        return APIResponse;
+
+        return await Task.FromResult(response);
     }
 }
 

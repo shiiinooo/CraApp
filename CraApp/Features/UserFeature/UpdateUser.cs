@@ -57,38 +57,28 @@ public class UsersPutEndpoint : ICarterModule
                 // Ensure the ID in command matches the route parameter
                 if (command.Id != id)
                 {
-                    response.IsSuccess = false;
                     response.ErrorsMessages = new List<string> { "Route parameter ID does not match command ID." };
-                    response.StatusCode = HttpStatusCode.BadRequest;
                     return Results.BadRequest(response);
                 }
 
                 var result = await sender.Send(command);
 
                 response.Result = result;
-                response.IsSuccess = true;
-                response.StatusCode = HttpStatusCode.OK;
                 return Results.Ok(response);
             }
             catch (ArgumentException ex)
             {
-                response.IsSuccess = false;
                 response.ErrorsMessages = new List<string> { ex.Message };
-                response.StatusCode = HttpStatusCode.BadRequest;
                 return Results.BadRequest(response);
             }
             catch (KeyNotFoundException ex)
             {
-                response.IsSuccess = false;
                 response.ErrorsMessages = new List<string> { ex.Message };
-                response.StatusCode = HttpStatusCode.NotFound;
                 return Results.NotFound(response);
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
                 response.ErrorsMessages = new List<string> { ex.Message };
-                response.StatusCode = HttpStatusCode.InternalServerError;
                 return Results.Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.InternalServerError);
             }
         })

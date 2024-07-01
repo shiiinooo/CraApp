@@ -52,11 +52,8 @@ public class CreateMonthlyActivitiesTest
 
         var monthlyActivitiesDTO = await Helper.PopulateDataBase(_client);
        
-
-        Assert.Equal(HttpStatusCode.Created, Helper._APIResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, Helper._APIStatusCode);
         Assert.NotNull(Helper._APIResponse.Result);
-        Assert.True(Helper._APIResponse.IsSuccess);
-
         Assert.Equal(2023, monthlyActivitiesDTO.Year);
         Assert.Equal(12, monthlyActivitiesDTO.Month);
         Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
@@ -75,7 +72,6 @@ public class CreateMonthlyActivitiesTest
 
         var _createdMonthlyActivities = await Helper.Post(_monthlyActivitiesDTO, url, _client);
 
-        Assert.True(!Helper._APIResponse.IsSuccess);
         Assert.Null(Helper._APIResponse.Result);
         Assert.NotNull(Helper._APIResponse.ErrorsMessages);
         Assert.Equal("Day cannot exceed the month's max number of days or be less than zero.", Helper._APIResponse.ErrorsMessages.First());

@@ -47,15 +47,12 @@ public class UserMonthlyActivitiesGetEndpoint : ICarterModule
 
             if (monthlyActivities == null || !monthlyActivities.Any())
             {
-                response.IsSuccess = false;
-                response.StatusCode = HttpStatusCode.NotFound;
+                
                 response.ErrorsMessages = new List<string> { "No monthly activities found for this user." };
                 return Results.NotFound(response);
             }
 
             response.Result = monthlyActivities;
-            response.IsSuccess = true;
-            response.StatusCode = HttpStatusCode.OK;
 
             return Results.Ok(response);
         })

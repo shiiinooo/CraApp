@@ -26,11 +26,10 @@ public class DeleteMonthlyActitivities
         var response = await _client.DeleteAsync($"/api/monthlyActivities/{Id}");
 
         var result = await response.Content.ReadAsStringAsync();
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+       
 
-        _APIResponse = JsonSerializer.Deserialize<APIResponse>(result, options);
-        Assert.Equal(HttpStatusCode.NoContent, _APIResponse.StatusCode);
-        Assert.True(_APIResponse.IsSuccess);
+      
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
     }
 
@@ -45,8 +44,7 @@ public class DeleteMonthlyActitivities
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         _APIResponse = JsonSerializer.Deserialize<APIResponse>(result, options);
-        Assert.Equal(HttpStatusCode.NotFound, _APIResponse.StatusCode);
-        Assert.True(!_APIResponse.IsSuccess);
-        Assert.Equal("Key Not Found ", _APIResponse.ErrorsMessages.First());
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal("Key Not Found", _APIResponse.ErrorsMessages.First());
     }
 }

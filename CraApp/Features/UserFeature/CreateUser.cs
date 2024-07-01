@@ -61,29 +61,21 @@ public class UsersPostEndpoint : ICarterModule
                 var result = await sender.Send(command);
 
                 response.Result = result;
-                response.IsSuccess = true;
-                response.StatusCode = HttpStatusCode.Created;
                 return Results.Created($"/users/{result.Id}", response);
             }
             catch (ArgumentException ex)
             {
-                response.IsSuccess = false;
                 response.ErrorsMessages = new List<string> { ex.Message };
-                response.StatusCode = HttpStatusCode.BadRequest;
                 return Results.BadRequest(response);
             }
             catch (InvalidOperationException ex)
             {
-                response.IsSuccess = false;
                 response.ErrorsMessages = new List<string> { ex.Message };
-                response.StatusCode = HttpStatusCode.Conflict;
                 return Results.Conflict(response);
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
                 response.ErrorsMessages = new List<string> { ex.Message };
-                response.StatusCode = HttpStatusCode.InternalServerError;
                 return Results.Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.InternalServerError);
             }
         })

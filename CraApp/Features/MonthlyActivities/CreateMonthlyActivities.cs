@@ -20,45 +20,39 @@ public class CreateMonthlyActivities : ICarterModule
 
     private async Task<IResult> CreateMonthlyActivitiesHandler(ISender sender, [FromBody] MonthlyActivitiesDTO monthlyActivities)
     {
-        APIResponse APIResponse = new APIResponse();
-        CreateMonthlyActivitiesCommand command = monthlyActivities.Adapt<CreateMonthlyActivitiesCommand>();
+        var response = new APIResponse();
+        var command = monthlyActivities.Adapt<CreateMonthlyActivitiesCommand>();
 
         try
         {
             foreach (var activityDTO in monthlyActivities.Activities)
             {
-                var temp = await ActivityValidator(activityDTO);
+                var validationResponse = await ActivityValidator(activityDTO);
                 int daysInMonth = DateTime.DaysInMonth(monthlyActivities.Year, monthlyActivities.Month);
+
                 if (daysInMonth < activityDTO.Day || activityDTO.Day <= 0)
                 {
-                    APIResponse.IsSuccess = false;
-                    APIResponse.StatusCode = HttpStatusCode.BadRequest;
-                    APIResponse.ErrorsMessages = new List<string> { "Day cannot exceed the month's max number of days or be less than zero." };
-                    return Results.BadRequest(APIResponse);
+                    response.ErrorsMessages.Add("Day cannot exceed the month's max number of days or be less than zero.");
+                    return Results.BadRequest(response);
                 }
-                if (!temp.IsSuccess)
+                if (validationResponse.ErrorsMessages.Count > 0)
                 {
-                    APIResponse.IsSuccess = false;
-                    APIResponse.StatusCode = temp.StatusCode;
-                    APIResponse.ErrorsMessages = temp.ErrorsMessages;
-                    return Results.BadRequest(APIResponse);
+                    response.ErrorsMessages.AddRange(validationResponse.ErrorsMessages);
+                    return Results.BadRequest(response);
                 }
             }
 
             var result = await sender.Send(command);
-            APIResponse.IsSuccess = true;
-            APIResponse.Result = result;
-            APIResponse.StatusCode = HttpStatusCode.Created;
-            return Results.Created($"/api/monthlyActivities/{result.id}", APIResponse);
+            response.Result = result;
+            return Results.Created($"/api/monthlyActivities/{result.id}", response);
         }
         catch (InvalidOperationException ex)
         {
-            APIResponse.IsSuccess = false;
-            APIResponse.StatusCode = HttpStatusCode.BadRequest;
-            APIResponse.ErrorsMessages = new List<string> { ex.Message };
-            return Results.BadRequest(APIResponse);
+            response.ErrorsMessages.Add(ex.Message);
+            return Results.BadRequest(response);
         }
     }
+
 }
 
 internal class CreateMonthlyActivitiesHandler : ICommandHandler<CreateMonthlyActivitiesCommand, CreateMonthlyActivitiesResult>
