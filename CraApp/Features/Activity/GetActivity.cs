@@ -27,8 +27,6 @@ public class GetActivity : ICarterModule
         var query = new GetAcitivityQuery();
         var result = await sender.Send(query);
 
-        aPIResponse.StatusCode = HttpStatusCode.OK;
-        aPIResponse.IsSuccess = true;
         aPIResponse.Result = result;
 
         return Results.Ok(aPIResponse);

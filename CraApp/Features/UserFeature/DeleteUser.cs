@@ -42,22 +42,16 @@ public class UsersDeleteEndpoint : ICarterModule
             {
                 await sender.Send(new DeleteUserCommand(id));
 
-                response.IsSuccess = true;
-                response.StatusCode = HttpStatusCode.NoContent;
                 return Results.Ok(response);
             }
             catch (KeyNotFoundException ex)
             {
-                response.IsSuccess = false;
                 response.ErrorsMessages = new List<string> { ex.Message };
-                response.StatusCode = HttpStatusCode.NotFound;
                 return Results.NotFound(response);
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
                 response.ErrorsMessages = new List<string> { ex.Message };
-                response.StatusCode = HttpStatusCode.InternalServerError;
                 return Results.Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.InternalServerError);
             }
         })

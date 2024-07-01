@@ -23,9 +23,6 @@ public class GetMonthlyActivities : ICarterModule
         APIResponse aPIResponse = new();
         var query = new GetMonthlyActivitiesQuery();
         var result = await sender.Send(query);
-
-        aPIResponse.StatusCode = HttpStatusCode.OK;
-        aPIResponse.IsSuccess = true;
         aPIResponse.Result = result;
 
         return Results.Ok(aPIResponse);

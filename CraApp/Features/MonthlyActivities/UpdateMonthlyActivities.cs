@@ -19,40 +19,33 @@ public class UpdateMonthlyActivities : ICarterModule
 
     private async Task<IResult> UpdateMonthlyActivitiesHandler(ISender sender, MonthlyActivitiesDTO monthlyActivitiesDTO)
     {
-        APIResponse APIResponse = new APIResponse();
-        APIResponse.IsSuccess= true;
+        var response = new APIResponse();
         var command = monthlyActivitiesDTO.Adapt<UpdateMonthlyActivitiesCommand>();
-        foreach(ActivityDTO activityDTO in monthlyActivitiesDTO.Activities)
+
+        foreach (ActivityDTO activityDTO in monthlyActivitiesDTO.Activities)
         {
-            var temp = await CreateActivity.ActivityValidator(activityDTO);
-            int DaysInMonth = DateTime.DaysInMonth(monthlyActivitiesDTO.Year, monthlyActivitiesDTO.Month);
-            if (DaysInMonth < activityDTO.Day || activityDTO.Day <= 0)
+            var validationResponse = await CreateActivity.ActivityValidator(activityDTO);
+            int daysInMonth = DateTime.DaysInMonth(monthlyActivitiesDTO.Year, monthlyActivitiesDTO.Month);
+
+            if (daysInMonth < activityDTO.Day || activityDTO.Day <= 0)
             {
-                APIResponse.IsSuccess = false;
-                APIResponse.StatusCode = HttpStatusCode.BadRequest;
-                APIResponse.ErrorsMessages = new List<string> { "Day cannot exceded month max number of days or be less than zero. " };
-                return Results.BadRequest(APIResponse);
-            }
-            if (!temp.IsSuccess)
-            {
-                APIResponse.IsSuccess = false;
-                APIResponse.StatusCode = temp.StatusCode;
-                APIResponse.ErrorsMessages = temp.ErrorsMessages;
-                return Results.BadRequest(APIResponse);
+                response.ErrorsMessages.Add("Day cannot exceed the month's max number of days or be less than zero.");
+                return Results.BadRequest(response);
             }
 
+            if (validationResponse.ErrorsMessages.Count > 0)
+            {
+                response.ErrorsMessages.AddRange(validationResponse.ErrorsMessages);
+                return Results.BadRequest(response);
+            }
         }
-        if (APIResponse.IsSuccess)
-        {
-            var result = await sender.Send(command);
-            APIResponse.IsSuccess = true;
-            APIResponse.Result = result;
-            APIResponse.StatusCode = HttpStatusCode.NoContent;
-            return Results.Created($"api/activity/", APIResponse);
 
-        }
-        return Results.BadRequest(APIResponse);
+        var result = await sender.Send(command);
+        response.Result = result;
+
+        return Results.Ok(response);
     }
+
 }
 
 internal class UpdateMonthlyActivitiesHandler(IMonthlyActivitiesRepository _monthlyActivitiesRepository) : 

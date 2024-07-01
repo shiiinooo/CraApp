@@ -57,7 +57,6 @@ public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
         var apiResponse = await response.Content.ReadFromJsonAsync<APIResponse>();
 
         Assert.NotNull(apiResponse);
-        Assert.False(apiResponse.IsSuccess);
         Assert.NotEmpty(apiResponse.ErrorsMessages ?? new List<string>());
     }
 

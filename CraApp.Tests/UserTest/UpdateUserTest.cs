@@ -55,7 +55,6 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
 
         // Assert
         Assert.NotNull(updateApiResponse);
-        Assert.True(updateApiResponse.IsSuccess);
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
         Assert.Empty(updateApiResponse.ErrorsMessages ?? new List<string>());
         Assert.NotNull(updatedUserResponse);

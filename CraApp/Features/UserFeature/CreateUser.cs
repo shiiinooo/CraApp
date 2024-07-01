@@ -82,32 +82,35 @@ public class UsersPostEndpoint : ICarterModule
         {
             var result = await sender.Send(command);
 
-            response.Result = result;
-            response.IsSuccess = true;
-            response.StatusCode = HttpStatusCode.Created;
-            return Results.Created($"/users/", response);
-        }
-        catch (ArgumentException ex)
-        {
-            response.IsSuccess = false;
-            response.ErrorsMessages = new List<string> { ex.Message };
-            response.StatusCode = HttpStatusCode.BadRequest;
-            return Results.BadRequest(response);
-        }
-        catch (InvalidOperationException ex)
-        {
-            response.IsSuccess = false;
-            response.ErrorsMessages = new List<string> { ex.Message };
-            response.StatusCode = HttpStatusCode.Conflict;
-            return Results.Conflict(response);
-        }
-        catch (Exception ex)
-        {
-            response.IsSuccess = false;
-            response.ErrorsMessages = new List<string> { ex.Message };
-            response.StatusCode = HttpStatusCode.InternalServerError;
-            return Results.Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.InternalServerError);
-        }
+                response.Result = result;
+                return Results.Created($"/users", response);
+            }
+            catch (ArgumentException ex)
+            {
+                response.ErrorsMessages = new List<string> { ex.Message };
+                return Results.BadRequest(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                response.ErrorsMessages = new List<string> { ex.Message };
+                return Results.Conflict(response);
+            }
+            catch (Exception ex)
+            {
+                response.ErrorsMessages = new List<string> { ex.Message };
+                return Results.Problem(detail: ex.Message, statusCode: (int)HttpStatusCode.InternalServerError);
+            }
+        })
+        .RequireAuthorization("AdminOnly") // Apply the AdminOnly policy
+        .Produces<APIResponse>(StatusCodes.Status201Created)
+        .ProducesProblem(StatusCodes.Status400BadRequest)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status403Forbidden)
+        .ProducesProblem(StatusCodes.Status409Conflict)
+        .ProducesProblem(StatusCodes.Status500InternalServerError)
+        .WithName("CreateUser")
+        .WithSummary("Create User")
+        .WithDescription("Create a new user");
     }
 
   

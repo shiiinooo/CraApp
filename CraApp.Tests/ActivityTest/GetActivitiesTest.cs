@@ -22,10 +22,10 @@ public class GetActivitiesTest
         //_response = result.Adapt<APIResponse>();
         
         _APIresponse = await result.Content.ReadFromJsonAsync<APIResponse>();
-        
+
         Assert.NotNull(_APIresponse);
-        Assert.True(_APIresponse.IsSuccess);    
-        Assert.Equal(HttpStatusCode.OK, _APIresponse.StatusCode);
         Assert.NotNull(_APIresponse.Result);
+        Assert.Empty(_APIresponse.ErrorsMessages); // Ensure there are no error messages
+        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
     }
 }

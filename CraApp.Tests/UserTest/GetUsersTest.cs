@@ -33,7 +33,6 @@ public class GetUsersTest : IClassFixture<WebApplicationFactory<Program>>
         // Deserialize APIResponse with options
         var apiResponse = JsonSerializer.Deserialize<APIResponse>(responseString, _options);
         Assert.NotNull(apiResponse);
-        Assert.True(apiResponse.IsSuccess);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Empty(apiResponse.ErrorsMessages ?? new List<string>());
 
@@ -42,7 +41,6 @@ public class GetUsersTest : IClassFixture<WebApplicationFactory<Program>>
         var users = JsonSerializer.Deserialize<List<UserDTO>>(jsonElement.GetRawText(), _options);
 
         Assert.NotNull(apiResponse);
-        Assert.True(apiResponse.IsSuccess);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Empty(apiResponse.ErrorsMessages ?? new List<string>());
 

@@ -9,7 +9,7 @@ public class DeleteMonthlyActivites : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/api/monthlyActivities/{Id:int}", DeleteMonthlyActivitesHandler)
+        app.MapDelete("/api/monthlyActivities/{Id:int}", DeleteMonthlyActivitiesHandler)
             .WithName("DeleteMonthlyActivities")
             .Produces<APIResponse>(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)
@@ -17,22 +17,20 @@ public class DeleteMonthlyActivites : ICarterModule
             .WithTags("MonthlyActivities");
     }
 
-    private async Task<IResult> DeleteMonthlyActivitesHandler(ISender sender, int Id)
+    private async Task<IResult> DeleteMonthlyActivitiesHandler(ISender sender, int Id)
     {
-        APIResponse APIResponse = new();
+        var response = new APIResponse();
         var result = await sender.Send(new DeleteMonthlyActivitiesCommand(Id));
+
         if (result.IsSuccess)
         {
-            APIResponse.IsSuccess = true;
-            APIResponse.StatusCode = HttpStatusCode.NoContent;
-            return Results.Ok(APIResponse);
+            return Results.NoContent();
         }
-        APIResponse.IsSuccess = false;
-        APIResponse.ErrorsMessages = new List<string> { "Key Not Found " };
-        APIResponse.StatusCode = HttpStatusCode.NotFound;
-        return Results.NotFound(APIResponse);
 
+        response.ErrorsMessages.Add("Key Not Found");
+        return Results.NotFound(response);
     }
+
 }
 internal class DeleteMonthlyActivitiesHandler(IMonthlyActivitiesRepository _monthlyActivitiesRepository) : ICommandHandler<DeleteMonthlyActivitiesCommand, DeleteMonthlyActivitiesResult>
 {

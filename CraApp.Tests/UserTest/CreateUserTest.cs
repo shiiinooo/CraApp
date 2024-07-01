@@ -36,8 +36,7 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
         var createdUser = await Helper.Post(_newUser, url, _client);
 
         Assert.NotNull(Helper._APIResponse);
-        Assert.True(Helper._APIResponse.IsSuccess);
-        Assert.Equal(HttpStatusCode.Created, Helper._APIResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, Helper._APIStatusCode);
         Assert.Empty(Helper._APIResponse.ErrorsMessages ?? new List<string>());
 
         // Deserialize the Result to UserDTO
@@ -70,10 +69,9 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
         var userDTO = await Helper.Post(invalidUser, url, _client);
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, Helper._APIResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, Helper._APIStatusCode);
 
         Assert.NotNull(Helper._APIResponse);
-        Assert.False(Helper._APIResponse.IsSuccess);
         Assert.NotEmpty(Helper._APIResponse.ErrorsMessages ?? new List<string>());
         _client.Dispose();
     }
@@ -100,12 +98,11 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
         var result = await Helper.Post(newUser, "/users", _client);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Conflict, Helper._APIResponse.StatusCode);
+        Assert.Equal(HttpStatusCode.Conflict, Helper._APIStatusCode);
 
         
 
         Assert.NotNull(Helper._APIResponse);
-        Assert.False(Helper._APIResponse.IsSuccess);
         Assert.NotEmpty(Helper._APIResponse.ErrorsMessages ?? new List<string>());
 
         await Helper.CleanUsers(_client, createduser.Id);
@@ -128,12 +125,9 @@ public class CreateUserTest : IClassFixture<WebApplicationFactory<Program>>
         var response = await Helper.Post(invalidUser, "/users",_client );
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, Helper._APIResponse.StatusCode);
-
-       
+        Assert.Equal(HttpStatusCode.BadRequest, Helper._APIStatusCode);
 
         Assert.NotNull(Helper._APIResponse);
-        Assert.False(Helper._APIResponse.IsSuccess);
         Assert.NotEmpty(Helper._APIResponse.ErrorsMessages ?? new List<string>());
     }
 

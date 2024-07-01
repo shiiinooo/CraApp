@@ -4,7 +4,7 @@
 public static class Helper
 {
     public  static APIResponse _APIResponse;
-
+    public static HttpStatusCode _APIStatusCode;
 
     public async static Task<T> Post<T>(T dto, string url ,HttpClient _client)
     {
@@ -15,8 +15,9 @@ public static class Helper
 
         var response = await _client.PostAsync(url, content);
 
+        _APIStatusCode = response.StatusCode;
         var result = await response.Content.ReadAsStringAsync();
-
+        
         var options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true

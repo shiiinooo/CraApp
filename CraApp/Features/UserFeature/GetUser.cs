@@ -42,16 +42,11 @@ public class UserGetByIdEndpoint : ICarterModule
 
             if (user == null)
             {
-                response.IsSuccess = false;
-                response.StatusCode = HttpStatusCode.NotFound;
                 response.ErrorsMessages = new List<string> { "User not found" };
                 return Results.NotFound(response);
             }
 
             response.Result = user;
-            response.IsSuccess = true;
-            response.StatusCode = HttpStatusCode.OK;
-
             return Results.Ok(response);
         })
         .RequireAuthorization("AdminOnly")
