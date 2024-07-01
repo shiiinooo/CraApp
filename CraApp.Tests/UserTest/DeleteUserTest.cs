@@ -6,11 +6,17 @@ public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
+    private LoginRequestDTO _adminLoginRequestDTO;
 
     public DeleteUserTest(WebApplicationFactory<Program> factory)
     {
         _factory = factory;
         _client = _factory.CreateClient();
+        _adminLoginRequestDTO = new LoginRequestDTO
+        {
+            UserName = "shiinoo",
+            Password = "Password123#"
+        };
     }
 
     [Fact]
@@ -27,7 +33,7 @@ public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
             Role = Role.admin.ToString(),
         };
       
-        var createdUser = await Helper.Post(newUser, "/users", _client);
+        var createdUser = await Helper.Post(newUser, "/users", _client, _adminLoginRequestDTO);
 
 
         // Act
@@ -43,7 +49,7 @@ public class DeleteUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task DeleteUser_Endpoint_Returns_NotFound_For_NonExistent_User()
     {
         // Arrange
-        var token = await Helper.GetJwtToken(_client);
+        var token = await Helper.GetJwtToken(_client, _adminLoginRequestDTO);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         //var client = _factory.CreateClient();
         var nonExistentUserId = 9999; // An ID that doesn't exist

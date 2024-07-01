@@ -7,11 +7,17 @@ namespace CraApp.Tests.ActivityTest
         private readonly WebApplicationFactory<Program> _factory;
         private readonly HttpClient _client;
         private readonly string url = "/api/activity";
+        private LoginRequestDTO _adminLoginRequestDTO;
 
         public CreateActivityTest()
         {
             _factory = new WebApplicationFactory<Program>();
             _client = _factory.CreateClient();
+            _adminLoginRequestDTO = new LoginRequestDTO
+            {
+                UserName = "shiinoo",
+                Password = "Password123#"
+            };
         }
 
         [Fact]
@@ -28,7 +34,7 @@ namespace CraApp.Tests.ActivityTest
                 MonthlyActivitiesId = monthlyActivitiesDTO.Id
             };
 
-            var createdActivity = await Helper.Post(_activity, url, _client);
+            var createdActivity = await Helper.Post(_activity, url, _client, _adminLoginRequestDTO);
 
             // Assert the values
             Assert.Equal(HttpStatusCode.Created, Helper._APIStatusCode);
@@ -40,7 +46,7 @@ namespace CraApp.Tests.ActivityTest
             Assert.Equal(_activity.EndTime, createdActivity.EndTime);
             Assert.Equal(_activity.Project, createdActivity.Project);
 
-            await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
+            await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id, _adminLoginRequestDTO);
         }
 
         [Fact]
@@ -57,14 +63,14 @@ namespace CraApp.Tests.ActivityTest
                 MonthlyActivitiesId = monthlyActivitiesDTO.Id
             };
 
-            var result = await Helper.Post(_activity, url, _client);
+            var result = await Helper.Post(_activity, url, _client, _adminLoginRequestDTO);
 
             Assert.Equal(HttpStatusCode.BadRequest, Helper._APIStatusCode);
             Assert.NotNull(Helper._APIResponse);
             Assert.Null(Helper._APIResponse.Result);
             Assert.NotEmpty(Helper._APIResponse.ErrorsMessages);
 
-            await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
+            await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id, _adminLoginRequestDTO);
         }
 
         [Fact]
@@ -81,14 +87,14 @@ namespace CraApp.Tests.ActivityTest
                 MonthlyActivitiesId = monthlyActivitiesDTO.Id
             };
 
-            var result = await Helper.Post(_activity, url, _client);
+            var result = await Helper.Post(_activity, url, _client, _adminLoginRequestDTO);
 
             Assert.Equal(HttpStatusCode.BadRequest, Helper._APIStatusCode);
             Assert.NotNull(Helper._APIResponse);
             Assert.Null(Helper._APIResponse.Result);
             Assert.NotEmpty(Helper._APIResponse.ErrorsMessages);
 
-            await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
+            await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id, _adminLoginRequestDTO);
         }
     }
 }

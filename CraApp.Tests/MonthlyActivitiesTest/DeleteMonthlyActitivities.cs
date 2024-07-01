@@ -8,12 +8,17 @@ public class DeleteMonthlyActitivities
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
     private APIResponse _APIResponse;
-
+    private LoginRequestDTO _adminLoginRequestDTO;
     public DeleteMonthlyActitivities()
     {
         _factory = new WebApplicationFactory<Program>();
         _client = _factory.CreateClient();
         _APIResponse = new APIResponse();
+        _adminLoginRequestDTO = new LoginRequestDTO
+        {
+            UserName = "shiinoo",
+            Password = "Password123#"
+        };
     }
 
     [Fact]
@@ -30,7 +35,7 @@ public class DeleteMonthlyActitivities
 
       
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-        Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
+        Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id, _adminLoginRequestDTO);
     }
 
     [Fact]

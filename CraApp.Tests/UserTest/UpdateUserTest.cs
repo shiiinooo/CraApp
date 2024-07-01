@@ -8,6 +8,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
     private readonly HttpClient _client;
     private JsonSerializerOptions _options;
     private UserDTO _newUser;
+    private LoginRequestDTO _adminLoginRequestDTO;
 
     public UpdateUserTest(WebApplicationFactory<Program> factory)
     {
@@ -25,17 +26,19 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
             Password = "Admin123@",
             Role = Role.admin.ToString()
         };
+
+        _adminLoginRequestDTO = new LoginRequestDTO
+        {
+            UserName = "shiinoo",
+            Password = "Password123#"
+        };
     }
 
     [Fact]
     public async Task UpdateUser_Endpoint_Returns_Correct_Response()
     {
         // Arrange
-
-        
-        var createdUser = await Helper.Post(_newUser, "/users", _client);
-      
-
+        var createdUser = await Helper.Post(_newUser, "/users", _client, _adminLoginRequestDTO);
         // Update user data
         var updatedUser = new UserDTO
         {
@@ -61,16 +64,15 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
         Assert.Equal(updatedUser.UserName, updatedUserResponse.UserName);
         Assert.Equal(updatedUser.Name, updatedUserResponse.Name);
 
-        await Helper.CleanUsers(_client, createdUser.Id);
+        await Helper.CleanUsers(_client, createdUser.Id, _adminLoginRequestDTO);
         _client.Dispose();
     }
 
     [Fact]
     public async Task UpdateUser_Endpoint_Returns_NotFound_For_Nonexistent_User()
     {
-        // Arrange
-
-        var token = await Helper.GetJwtToken(_client);
+        // Arrange      
+        var token = await Helper.GetJwtToken(_client, _adminLoginRequestDTO);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var nonExistentUserId = 999; // Assuming this ID does not exist
 
@@ -96,7 +98,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
     public async Task UpdateUser_Endpoint_Returns_BadRequest_For_Invalid_Input()
     {
         // Arrange
-        var createdUser = await Helper.Post(_newUser, "/users", _client);
+        var createdUser = await Helper.Post(_newUser, "/users", _client, _adminLoginRequestDTO);
        
         // Attempt to update with invalid data (empty UserName)
         var invalidUpdateUser = new UserDTO
@@ -113,7 +115,7 @@ public class UpdateUserTest : IClassFixture<WebApplicationFactory<Program>>
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        await Helper.CleanUsers(_client, createdUser.Id);
+        await Helper.CleanUsers(_client, createdUser.Id, _adminLoginRequestDTO);
         _client.Dispose();
     }
 

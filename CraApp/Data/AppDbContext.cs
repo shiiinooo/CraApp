@@ -47,7 +47,17 @@ public class AppDbContext : DbContext
                 Name = "Marouane",
                 Password = "Password123#",
                 Role = Role.admin
-            });
+            },
+             new User()
+             {
+                 Id = 3,
+                 UserName = "user",
+                 Name = "user",
+                 Password = "user",
+                 Role = Role.user
+             }
+
+            );
         modelBuilder.Entity<MonthlyActivities>().HasData(
 
             new MonthlyActivities()

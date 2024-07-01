@@ -5,25 +5,31 @@ public static class Helper
 {
     public  static APIResponse _APIResponse;
     public static HttpStatusCode _APIStatusCode;
-
-    public async static Task<T> Post<T>(T dto, string url ,HttpClient _client)
+    public async static Task<T> Post<T>(T dto, string url ,HttpClient _client, LoginRequestDTO _LoginRequestDTO)
     {
-        var token = await Helper.GetJwtToken(_client);
+     
+        var token = await Helper.GetJwtToken(_client, _LoginRequestDTO);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        return await Post(dto, url, _client);
 
+
+
+    }
+    public async static Task<T> Post<T>(T dto, string url, HttpClient _client)
+    {
         var content = JsonContent.Create(dto);
 
         var response = await _client.PostAsync(url, content);
 
         _APIStatusCode = response.StatusCode;
         var result = await response.Content.ReadAsStringAsync();
-        
+
         var options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
 
-          _APIResponse = JsonSerializer.Deserialize<APIResponse>(result, options);
+        _APIResponse = JsonSerializer.Deserialize<APIResponse>(result, options);
 
         if (_APIResponse.Result is not null)
         {
@@ -37,16 +43,16 @@ public static class Helper
 
     }
 
-    public static async Task CleanMonthlyActivities(HttpClient _client, int Id)
+    public static async Task CleanMonthlyActivities(HttpClient _client, int Id, LoginRequestDTO _LoginRequestDTO)
     {
-        var token = await GetJwtToken(_client);
+        var token = await GetJwtToken(_client, _LoginRequestDTO);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await _client.DeleteAsync($"/api/monthlyActivities/{Id}");
     }
 
-    public static async Task CleanUsers(HttpClient _client, int Id)
+    public static async Task CleanUsers(HttpClient _client, int Id, LoginRequestDTO _LoginRequestDTO)
     {
-        var token = await GetJwtToken(_client);
+        var token = await GetJwtToken(_client, _LoginRequestDTO);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         await _client.DeleteAsync($"/users/{Id}");
 
@@ -66,19 +72,18 @@ public static class Helper
         MonthlyActivitiesDTO monthlyActivities = new MonthlyActivitiesDTO { Year = 2023, Month = 12,
             Activities = new List<ActivityDTO> { _activity } ,
             UserId =1};
-        
-      
 
-        return await Helper.Post(monthlyActivities, "api/monthlyActivities", _client);
 
-    }
-    public static  async Task<string> GetJwtToken(HttpClient _client)
-    {
-        var loginRequest = new
+        var loginRequest = new LoginRequestDTO
         {
             UserName = "shiinoo",
             Password = "Password123#"
         };
+        return await Helper.Post(monthlyActivities, "api/monthlyActivities", _client, loginRequest);
+
+    }
+    public static  async Task<string> GetJwtToken(HttpClient _client, LoginRequestDTO loginRequest)
+    {
 
         var response = await _client.PostAsJsonAsync("/login", loginRequest);
         response.EnsureSuccessStatusCode();

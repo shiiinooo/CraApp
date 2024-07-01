@@ -70,7 +70,7 @@ internal class CreateMonthlyActivitiesHandler : ICommandHandler<CreateMonthlyAct
     public async Task<CreateMonthlyActivitiesResult> Handle(CreateMonthlyActivitiesCommand command, CancellationToken cancellationToken)
     {
         var montlyActivities = command.Adapt<Model.MonthlyActivities>();
-        bool alreadyExist = await _monthlyActivitiesRepository.IsMonthlyActivitiesExisit(command.UserId, command.Year, command.Month);
+        //bool alreadyExist = await _monthlyActivitiesRepository.IsMonthlyActivitiesExisit(command.UserId, command.Year, command.Month);
         /*if (alreadyExist)
         {
             throw new InvalidOperationException("Monthly activities for this user and month already exist.");
