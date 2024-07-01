@@ -42,9 +42,6 @@ public class UsersGetEndpoint : ICarterModule
             var users = await sender.Send(query);
 
             response.Result = users;
-            response.IsSuccess = true;
-            response.StatusCode = users.Any() ? HttpStatusCode.OK : HttpStatusCode.NotFound;
-
             return Results.Ok(response);
         })
         .RequireAuthorization("AdminOnly")

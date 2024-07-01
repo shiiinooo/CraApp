@@ -16,7 +16,7 @@ public static class AuthEnpoints
 
     private static async Task<IResult> Login(IAuthRepository _authRepo, [FromBody] LoginRequestDTO model)
     {
-        APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.BadRequest };
+        APIResponse response = new() ;
         var loginResponse = await _authRepo.Login(model);
 
         if (loginResponse == null)
@@ -27,14 +27,13 @@ public static class AuthEnpoints
         }
 
         response.Result = loginResponse;
-        response.IsSuccess = true;
-        response.StatusCode = HttpStatusCode.OK;
+       
         return Results.Ok(response);
     }
 
     private static async Task<IResult> Register(IAuthRepository _authRepo, [FromBody] RegistrationRequestDTO model)
     {
-        APIResponse response = new() { IsSuccess = false, StatusCode = HttpStatusCode.BadRequest };
+        APIResponse response = new();
 
         bool ifUserNameIsUnique = _authRepo.IsUniqueUser(model.UserName);
         if (!ifUserNameIsUnique)
@@ -48,8 +47,7 @@ public static class AuthEnpoints
         {
             return Results.BadRequest(response);
         }
-        response.IsSuccess = true;
-        response.StatusCode = HttpStatusCode.OK;
+      
         return Results.Ok(response);
 
     }

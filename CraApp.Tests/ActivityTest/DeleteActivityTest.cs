@@ -36,8 +36,6 @@ public class DeleteActivityTest
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
         _APIResponse = JsonSerializer.Deserialize<APIResponse>(result,options);
-        Assert.Equal(HttpStatusCode.NoContent, _APIResponse.StatusCode);
-        Assert.True(_APIResponse.IsSuccess);
         await Helper.CleanMonthlyActivities(_client, monthlyActivitiesDTO.Id);
     }
 
@@ -51,9 +49,7 @@ public class DeleteActivityTest
         var result = await response.Content.ReadAsStringAsync();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
-        _APIResponse = JsonSerializer.Deserialize<APIResponse>(result, options);
-        Assert.Equal(HttpStatusCode.NotFound, _APIResponse.StatusCode);
-        Assert.True(!_APIResponse.IsSuccess);
+        _APIResponse = JsonSerializer.Deserialize<APIResponse>(result, options);;
         Assert.Equal("Key Not Found ", _APIResponse.ErrorsMessages.First());
     }
 }

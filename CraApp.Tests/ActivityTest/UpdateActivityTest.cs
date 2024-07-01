@@ -40,8 +40,9 @@ public class UpdateActivityTest
         var jsonElement = (JsonElement)_APIResponse.Result;
         var updatedActivity = JsonSerializer.Deserialize<ActivityDTO>(jsonElement.GetRawText(), options);
 
-        Assert.True(_APIResponse.IsSuccess);
-        Assert.Equal(HttpStatusCode.OK, _APIResponse.StatusCode);
+        Assert.NotNull(_APIResponse);
+        Assert.Empty(_APIResponse.ErrorsMessages);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         Assert.Equal(ActivityDTO.StartTime, updatedActivity.StartTime);
         Assert.Equal(ActivityDTO.EndTime, updatedActivity.EndTime);

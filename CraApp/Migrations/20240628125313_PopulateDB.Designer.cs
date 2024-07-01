@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CraApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240628110259_PopulateDB")]
+    [Migration("20240628125313_PopulateDB")]
     partial class PopulateDB
     {
         /// <inheritdoc />
